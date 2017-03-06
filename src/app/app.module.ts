@@ -3,7 +3,11 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
+import { StoreModule } from '@ngrx/store';
+
 import { AppComponent } from './app.component';
+
+import { reducer } from './reducers/reducer'
 
 @NgModule({
   declarations: [
@@ -12,7 +16,8 @@ import { AppComponent } from './app.component';
   imports: [
     BrowserModule,
     FormsModule,
-    HttpModule
+    HttpModule,
+    StoreModule.provideStore(reducer)
   ],
   providers: [],
   bootstrap: [AppComponent]
