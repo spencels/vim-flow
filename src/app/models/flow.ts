@@ -2,66 +2,55 @@ export interface Argument {
     contents: string
 };
 
-export interface Speech {
-    arguments: Argument[]
-};
+export type Speech = Argument[]
 
-export function createSpeech(arguments_: Argument[]) {
-    return {
-        arguments: arguments_
-    };
-}
+export type ArgumentGroup = Speech[]
 
-export interface ArgumentGroup {
-    speeches: Speech[]
-};
-
-export function createArgumentGroup(speeches: Speech[]) {
-    return { speeches };
-}
-
-export interface Flow {
+export class Flow {
     // Outer list is speeches, inner list is arguments.
-    argumentGroups: ArgumentGroup[];
-    cursor: Argument;
-}
+    argumentGroups: ArgumentGroup[] = [];
+    cursor: Argument = null;
 
-export function createFlow(argumentGroups: ArgumentGroup[], cursor: Argument) {
-    return { argumentGroups, cursor
-    };
-}
-
-export class ArgumentSelection {
-    constructor(
-        public iArgumentGroup: number,
-        public iSpeech: number,
-        public iArgument: number) {}
-}
-
-// Finds (argumentGroup, speech, argument) index tuple for the given argument.
-// Returns null if not found.
-export function findArgument(
-        argumentGroups: ArgumentGroup[], argument: Argument) {
-    for (var iGroup = 0; iGroup < argumentGroups.length; iGroup++) {
-        let argumentGroup = argumentGroups[iGroup];
-        for (var iSpeech = 0; iSpeech < argumentGroup.speeches.length;
-                iSpeech++) {
-            let speech = argumentGroup.speeches[iSpeech];
-            for (var iArgument = 0; iArgument < speech.arguments.length;
-                    iArgument++) {
-                let testArgument = speech.arguments[iArgument];
-                if (Object.is(testArgument, argument)) {
-                    return {
-                        iArgumentGroup: iGroup,
-                        iSpeech: iSpeech,
-                        iArgument: iArgument,
-                        argumentGroup: argumentGroup,
-                        speech: speech,
-                        argument: argument
-                    };
+    findArgument(argument: Argument) {
+        for (var iGroup = 0; iGroup < this.argumentGroups.length; iGroup++) {
+            let argumentGroup = this.argumentGroups[iGroup];
+            for (var iSpeech = 0; iSpeech < argumentGroup.length;
+                    iSpeech++) {
+                let speech = argumentGroup[iSpeech];
+                for (var iArgument = 0; iArgument < speech.length;
+                        iArgument++) {
+                    let testArgument = speech[iArgument];
+                    if (Object.is(testArgument, argument)) {
+                        return {
+                            iArgumentGroup: iGroup,
+                            iSpeech: iSpeech,
+                            iArgument: iArgument,
+                            argumentGroup: argumentGroup,
+                            speech: speech,
+                            argument: argument
+                        };
+                    }
                 }
             }
         }
+        return null
     }
-    return null
+
+    // Finds (argumentGroup, speech, argument) index tuple for the given argument.
+    // Returns null if not found.
+    deleteArgumentAtCursor() {
+        if (this.cursor == null) throw "null cursor"
+        let { iArgumentGroup, iSpeech, iArgument } =
+            this.findArgument(this.cursor);
+        this.argumentGroups[iArgumentGroup][iSpeech].splice(iArgument, 1);
+        if (this.argumentGroups[iArgumentGroup][iSpeech].length == 0) {
+            this.argumentGroups[iArgumentGroup].splice(iSpeech, 1);
+        }
+        this.cursor = null;
+    }
+
+    countSpeeches() {
+        return this.argumentGroups.map(x => x.length)
+            .reduce((acc, val) => Math.max(acc, val));
+    }
 }
