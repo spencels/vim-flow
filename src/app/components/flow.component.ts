@@ -1,15 +1,20 @@
 import { Component, Input, EventEmitter } from '@angular/core'
 
-import { Flow } from 'app/models/flow'
+import { Flow, Argument } from 'app/models/flow'
 
 @Component({
-  selector: 'flow',
+  selector: 'app-flow',
   template: `
-    <div class="argumentGroup" *ngFor="let argumentGroups of flow.argumentGroups">
-      <div class="speech" *ngFor="let speeches of argumentGroups">
-        <md-card class="argument" *ngFor="let argument of speeches">
-          {{ argument.contents }}
-        </md-card>
+    <div class="flow-container">
+      <div class="argumentGroup"
+           *ngFor="let argumentGroup of flow.argumentGroups">
+        <div class="speech" *ngFor="let speech of argumentGroup">
+          <app-argument
+            *ngFor="let argument of speech"
+            [argument]="argument"
+            [selected]="isArgumentSelected(argument)">
+          </app-argument>
+        </div>
       </div>
     </div>
   `,
@@ -19,23 +24,26 @@ import { Flow } from 'app/models/flow'
       box-sizing: border-box;
     }
 
+    .flow-container {
+      display: table;
+    }
+
     .argumentGroup {
-      border: 2px solid;
-      float: left;
-      float: clear;
-      width: 100%;
+      display: table-row;
+      border-bottom: 2px solid #000;
     }
+
     .speech {
-      position: relative;
-      display: inline-block;
-      float: left;
+      display: table-cell;
+      margin: 1em;
     }
-    .argument {
-      float: left;
-      clear: left;
-    }
+
   `]
 })
 export class FlowComponent {
   @Input() flow: Flow;
+
+  isArgumentSelected(argument: Argument) {
+    return Object.is(this.flow.cursor, argument);
+  }
 }

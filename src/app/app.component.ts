@@ -5,7 +5,7 @@ import * as flow from 'app/models/flow'
 @Component({
   selector: 'app-root',
   template: `
-    <flow [flow]="flow"></flow>
+    <app-flow [flow]="flow"></app-flow>
   `,
 })
 export class AppComponent {
@@ -30,6 +30,6 @@ export class AppComponent {
         ]
       ]
     ]
-    this.flow.cursor = { contents: "Contentytents" }
+    this.flow.cursor = this.flow.argumentGroups[0][0][0];
   }
 }

@@ -5,12 +5,14 @@ import { HttpModule } from '@angular/http';
 import { MaterialModule } from '@angular/material'
 
 import { AppComponent } from 'app/app.component';
-import { FlowComponent } from 'app/components/flow.component'
+import { FlowComponent } from 'app/components/flow.component';
+import { ArgumentComponent } from 'app/components/argument.component'
 
 @NgModule({
   declarations: [
     AppComponent,
-    FlowComponent
+    FlowComponent,
+    ArgumentComponent
   ],
   imports: [
     BrowserModule,
