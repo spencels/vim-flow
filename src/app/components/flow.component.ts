@@ -47,6 +47,6 @@ export class FlowComponent {
   @Output() selectArgument = new EventEmitter();
 
   isArgumentSelected(argument: Argument) {
-    return Object.is(this.flow.cursor, argument);
+    return Object.is(this.flow.selectedArgument, argument);
   }
 }
