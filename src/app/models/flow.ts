@@ -14,15 +14,15 @@ export class Cursor {
     public iArgument: number) {}
 
   // Sentinel value for when no values are selected.
-  public static readonly EMPTY = new Cursor(-1, -1, -1)
+  public static readonly EMPTY = new Cursor(-1, 0, 0)
 }
 
 export class Flow {
   // Outer list is speeches, inner list is arguments.
-  argumentGroups: ArgumentGroup[] = [];
+  argumentGroups: ArgumentGroup[] = [[]];
 
   // Coordinates of selected argument.
-  cursor: Cursor = Cursor.EMPTY
+  cursor: Cursor = new Cursor(0, 0, 0)
 
   // Selected argument, or null if no argument is present at coordinates.
   selectedArgument: Argument | null = null;
@@ -223,7 +223,7 @@ export class Flow {
     this.speechesCount = this.countSpeeches()
   }
 
-  deleteArgumentGroupIfEmpty(iArgumentGroup: number) {
+  private deleteArgumentGroupIfEmpty(iArgumentGroup: number) {
     // Don't delete the last group.
     if (this.argumentGroups.length <= 1) return;
 
@@ -244,7 +244,7 @@ export class Flow {
 
   // Returns the maximum number of speeches held by an argument group. Does not
   // count speeches without arguments.
-  calculateSpeechesCount() {
+  private calculateSpeechesCount() {
     return this.argumentGroups.reduce(
       (accumulator, argumentGroup) => {
         // Find group length, ignoring speeches that are empty.
@@ -260,25 +260,28 @@ export class Flow {
   // Places a new argument at cursor and moves cursor to it. If `newGroup` is
   // true, creates a new argumentGroup.
   createArgument(argument: Argument, newGroup: boolean) {
+    // Don't do anything if cursor is empty.
+    if (this.cursor == Cursor.EMPTY) return;
+
     // Find or create speech.
     let speech: Speech
-    let iInsertAt
+    let iInsertArgumentAt
     if (newGroup) {
-      const newArgumentGroup = this.argumentGroups.push([])
-      speech = this.getOrCreateSpeech(
-        this.cursor.iArgumentGroup + 1, this.cursor.iSpeech)
-      iInsertAt = 0
+      const iNewArgumentGroup = this.cursor.iArgumentGroup + 1
+      const newArgumentGroup = this.getOrCreateArgumentGroup(iNewArgumentGroup)
+      speech = this.getOrCreateSpeech(iNewArgumentGroup, this.cursor.iSpeech)
+      iInsertArgumentAt = 0
     } else {
       speech = this.getSpeechAtCursor()
       if (speech) {
-        iInsertAt = this.cursor.iArgument + 1
+        iInsertArgumentAt = this.cursor.iArgument + 1
       } else {
         speech = this.getOrCreateSpeech(
           this.cursor.iArgumentGroup, this.cursor.iSpeech)
-        iInsertAt = 0
+        iInsertArgumentAt = 0
       }
     }
-    speech.splice(iInsertAt, 0, argument)
+    speech.splice(iInsertArgumentAt, 0, argument)
 
     // Set cursor to new argument.
     this.selectArgument(argument)  // TODO: Use moveCursor for performance

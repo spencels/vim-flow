@@ -48,25 +48,6 @@ export class AppComponent extends OnInit {
     this.mapShortcut(Mode.kNavigation, 'N', () => createArgument(true))
     this.mapShortcut(
       Mode.kNavigation, 'd', this.flow.deleteArgumentAtCursor.bind(this.flow))
-
-    // Add some default data.
-    this.flow.argumentGroups = [
-      [
-        [
-          { contents: "Arg1" },
-          { contents: "Arg2" }
-        ],
-        [
-          { contents: "Arg1Speech2"}
-        ]
-      ],
-      [
-        [
-          { contents: "Arg1" },
-          { contents: "Arg2" }
-        ]
-      ]
-    ]
   }
 
   // Maps keyboard shortcut.
