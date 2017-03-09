@@ -1,18 +1,22 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 
 import * as flow from 'app/models/flow'
 
 @Component({
   selector: 'app-root',
   template: `
-    <app-flow [flow]="flow"></app-flow>
+    <app-flow 
+      [flow]="flow"
+      (selectArgument)="selectArgument($event)"
+      (window:keypress)="keyPress($event)">
+    </app-flow>
   `,
 })
-export class AppComponent {
+export class AppComponent extends OnInit {
   title = 'app works!';
   flow = new flow.Flow();
 
-  constructor() {
+  ngOnInit() {
     this.flow.argumentGroups = [
       [
         [
@@ -30,6 +34,25 @@ export class AppComponent {
         ]
       ]
     ]
-    this.flow.cursor = this.flow.argumentGroups[0][0][0];
+  }
+
+  // Selects argument by reference.
+  selectArgument(argument: flow.Argument) {
+    this.flow.selectArgument(argument);
+  }
+
+  // @HostListener('keydown', ['$event'])
+  keyPress(event: KeyboardEvent) {
+    console.log('Key event ' + event.key);
+    switch (event.key) {
+      case 'j':
+        this.flow.selectDown();
+        break;
+      case 'k':
+        this.flow.selectUp();
+        break;
+      default:
+        break;
+    }
   }
 }

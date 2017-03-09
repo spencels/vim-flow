@@ -36,6 +36,85 @@ export class Flow {
         return null
     }
 
+    selectArgument(argument: Argument) {
+        this.cursor = argument;
+    }
+
+    // Moves cursor down to next argument.
+    selectDown() {
+        // If nothing selected, select first argument.
+        if (!this.cursor) {
+            if (this.argumentGroups.length > 0
+                    && this.argumentGroups[0].length > 0
+                    && this.argumentGroups[0][0].length > 0) {
+                this.cursor = this.argumentGroups[0][0][0];
+                return;
+            } else {
+                return;
+            }
+        }
+
+        let { iArgumentGroup, iSpeech, iArgument } =
+            this.findArgument(this.cursor)
+        
+        iArgument += 1;
+        if (iArgument < this.argumentGroups[iArgumentGroup][iSpeech].length) {
+            this.cursor = this.argumentGroups[iArgumentGroup][iSpeech][iArgument];
+            return;
+        }
+
+        // Move to next argument group.
+        iArgumentGroup += 1;
+        while (iArgumentGroup < this.argumentGroups.length) {
+            let hasSpeech = iSpeech < this.argumentGroups[iArgumentGroup].length
+            if (hasSpeech) {
+                if (this.argumentGroups[iArgumentGroup][iSpeech].length > 0) {
+                    this.cursor = this.argumentGroups[iArgumentGroup][iSpeech][0];
+                    return;
+                }
+            }
+            iArgumentGroup += 1;
+        }
+    }
+
+    // Moves cursor up to next argument.
+    selectUp() {
+        // If nothing selected, select first argument.
+        if (!this.cursor) {
+            if (this.argumentGroups.length > 0
+                    && this.argumentGroups[0].length > 0
+                    && this.argumentGroups[0][0].length > 0) {
+                this.cursor = this.argumentGroups[0][0][0];
+                return;
+            } else {
+                return;
+            }
+        }
+
+        let { iArgumentGroup, iSpeech, iArgument } =
+            this.findArgument(this.cursor)
+        
+        iArgument -= 1;
+        if (iArgument >= 0) {
+            this.cursor = this.argumentGroups[iArgumentGroup][iSpeech][iArgument];
+            return;
+        }
+
+        // Move to next argument group.
+        iArgumentGroup -= 1;
+        while (iArgumentGroup >= 0) {
+            let hasSpeech = iSpeech < this.argumentGroups[iArgumentGroup].length
+            if (hasSpeech) {
+                const speechLength = this.argumentGroups[iArgumentGroup][iSpeech].length 
+                if (speechLength > 0) {
+                    this.cursor = this.argumentGroups[iArgumentGroup][iSpeech][speechLength - 1];
+                    return;
+                }
+            }
+            iArgumentGroup -= 1;
+        }
+    }
+
     // Finds (argumentGroup, speech, argument) index tuple for the given argument.
     // Returns null if not found.
     deleteArgumentAtCursor() {

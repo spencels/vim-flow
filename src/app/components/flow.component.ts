@@ -1,4 +1,4 @@
-import { Component, Input, EventEmitter } from '@angular/core'
+import { Component, Input, Output, EventEmitter } from '@angular/core'
 
 import { Flow, Argument } from 'app/models/flow'
 
@@ -12,7 +12,8 @@ import { Flow, Argument } from 'app/models/flow'
           <app-argument
             *ngFor="let argument of speech"
             [argument]="argument"
-            [selected]="isArgumentSelected(argument)">
+            [selected]="isArgumentSelected(argument)"
+            (click)="selectArgument.emit(argument)">
           </app-argument>
         </div>
       </div>
@@ -30,7 +31,7 @@ import { Flow, Argument } from 'app/models/flow'
 
     .argumentGroup {
       display: table-row;
-      border-bottom: 2px solid #000;
+      border-bottom: 0.25em solid #000;
     }
 
     .speech {
@@ -42,6 +43,7 @@ import { Flow, Argument } from 'app/models/flow'
 })
 export class FlowComponent {
   @Input() flow: Flow;
+  @Output() selectArgument = new EventEmitter();
 
   isArgumentSelected(argument: Argument) {
     return Object.is(this.flow.cursor, argument);

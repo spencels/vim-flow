@@ -5,11 +5,9 @@ import { Argument } from 'app/models/flow'
 @Component({
   selector: 'app-argument',
   template: `
-    <div class="card-wrapper" [ngClass]="{'argument-selected':  selected}">
-      <md-card class="argumentClass">
-        {{ argument.contents }}
-      </md-card>
-    </div>
+    <md-card class="argument" [ngClass]="{'argument-selected':  selected}">
+      {{ argument.contents }}
+    </md-card>
   `,
 
   styles: [`
