@@ -27,6 +27,7 @@ import { Argument } from 'app/models/flow'
   `]
 })
 export class ArgumentComponent {
-  @Input() argument: Argument;
+  // Workaround for https://github.com/angular/angular-cli/issues/2034
+  @Input() argument = <Argument>null; 
   @Input() selected: boolean;
 }
