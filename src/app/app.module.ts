@@ -7,12 +7,14 @@ import { MaterialModule } from '@angular/material'
 import { AppComponent } from 'app/app.component';
 import { FlowComponent } from 'app/components/flow.component';
 import { ArgumentComponent } from 'app/components/argument.component'
+import { FocusDirective } from 'app/directives/focus'
 
 @NgModule({
   declarations: [
     AppComponent,
     FlowComponent,
-    ArgumentComponent
+    ArgumentComponent,
+    FocusDirective
   ],
   imports: [
     BrowserModule,

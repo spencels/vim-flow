@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core'
 
 import { Flow, Argument } from 'app/models/flow'
+import { EditModel } from 'app/models/edit'
 
 @Component({
   selector: 'app-flow',
@@ -16,9 +17,11 @@ import { Flow, Argument } from 'app/models/flow'
           </div>
           <template [ngIf]="iSpeech < argumentGroup.length">
             <app-argument
-                *ngFor="let argument of argumentGroup[iSpeech]"
+                *ngFor="let argument of argumentGroup[iSpeech]; let iArgument = index"
                 [argument]="argument"
                 [selected]="isArgumentSelected(argument)"
+                [editing]="isEditing(iArgumentGroup, iSpeech, iArgument)"
+                (editText)="editText.emit($event)"
                 (click)="selectArgumentInternal($event, argument)">
             </app-argument>
           </template>
@@ -56,8 +59,10 @@ import { Flow, Argument } from 'app/models/flow'
 })
 export class FlowComponent {
   @Input() flow: Flow
+  @Input() editModel: EditModel
   @Output() selectArgument = new EventEmitter()
   @Output() selectSpeech = new EventEmitter()
+  @Output() editText = new EventEmitter()
 
   private selectArgumentInternal(event: MouseEvent, argument: Argument) {
     event.stopPropagation()
@@ -79,5 +84,9 @@ export class FlowComponent {
     return this.flow.selectedArgument == null
       && this.flow.cursor.iArgumentGroup == iArgumentGroup
       && this.flow.cursor.iSpeech == iSpeech
+  }
+
+  isEditing(iArgumentGroup, iSpeech, iArgument) {
+    return this.editModel.isEditing(iArgumentGroup, iSpeech, iArgument)
   }
 }

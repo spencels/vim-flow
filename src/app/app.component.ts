@@ -1,12 +1,15 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 
-import * as flow from 'app/models/flow'
+import { Flow, Argument } from 'app/models/flow'
+import { EditModel } from 'app/models/edit'
 
 type KeyMap = { [key: string]: () => void }
 
+// Application mode.
 enum Mode {
-  kNavigation,
-  kEditingMode
+  Command,
+  Edit,
+  Select
 }
 
 @Component({
@@ -14,55 +17,61 @@ enum Mode {
   template: `
     <app-flow 
       [flow]="flow"
+      [editModel]="editModel"
       (selectArgument)="selectArgument($event)"
       (selectSpeech)="selectSpeech($event)"
+      (editText)="editText($event)"
       (window:keypress)="keyPress($event)">
     </app-flow>
   `,
 })
 export class AppComponent extends OnInit {
-  title = 'app works!';
-  flow = new flow.Flow();
-  navigationKeyMap: KeyMap = {}
-  mode: Mode = Mode.kNavigation
+  // Models
+  flow = new Flow();
+  editModel = new EditModel()
+  commandKeyMap: KeyMap = {}
+  editKeyMap: KeyMap = {}
+  mode: Mode = Mode.Command
 
   // TODO: Delete after implementing argument editing.
   argumentCounter = 0
 
   ngOnInit() {
     // Map keyboard shortcuts
-    let createArgument = (newGroup) =>
-      this.flow.createArgument(
-        { contents: `New arg ${this.argumentCounter}` }, newGroup)
     let moveArgument = (x, y) => this.flow.moveArgument(x, y)
 
-    this.mapShortcut(Mode.kNavigation, 'j', this.flow.selectDown.bind(this.flow))
-    this.mapShortcut(Mode.kNavigation, 'k', this.flow.selectUp.bind(this.flow))
-    this.mapShortcut(Mode.kNavigation, 'l', this.flow.selectRight.bind(this.flow))
-    this.mapShortcut(Mode.kNavigation, 'h', this.flow.selectLeft.bind(this.flow))
-    this.mapShortcut(Mode.kNavigation, 'J', () => moveArgument(0, 1))
-    this.mapShortcut(Mode.kNavigation, 'K', () => moveArgument(0, -1))
-    this.mapShortcut(Mode.kNavigation, 'L', () => moveArgument(1, 0))
-    this.mapShortcut(Mode.kNavigation, 'H', () => moveArgument(-1, 0))
-    this.mapShortcut(Mode.kNavigation, 'n', () => createArgument(false))
-    this.mapShortcut(Mode.kNavigation, 'N', () => createArgument(true))
+    this.mapShortcut(Mode.Command, 'j', this.flow.selectDown.bind(this.flow))
+    this.mapShortcut(Mode.Command, 'k', this.flow.selectUp.bind(this.flow))
+    this.mapShortcut(Mode.Command, 'l', this.flow.selectRight.bind(this.flow))
+    this.mapShortcut(Mode.Command, 'h', this.flow.selectLeft.bind(this.flow))
+    this.mapShortcut(Mode.Command, 'J', () => moveArgument(0, 1))
+    this.mapShortcut(Mode.Command, 'K', () => moveArgument(0, -1))
+    this.mapShortcut(Mode.Command, 'L', () => moveArgument(1, 0))
+    this.mapShortcut(Mode.Command, 'H', () => moveArgument(-1, 0))
+    this.mapShortcut(Mode.Command, 'n', () => this.createArgument(false))
+    this.mapShortcut(Mode.Command, 'N', () => this.createArgument(true))
     this.mapShortcut(
-      Mode.kNavigation, 'd', this.flow.deleteArgumentAtCursor.bind(this.flow))
+      Mode.Command, 'd', this.flow.deleteArgumentAtCursor.bind(this.flow))
+    this.mapShortcut(Mode.Command, 'e', () => this.editArgument(this.flow.selectedArgument))
+
+    this.mapShortcut(Mode.Edit, 'Enter', () => this.stopEditing())
   }
 
   // Maps keyboard shortcut.
   mapShortcut(mode, key, action) {
     switch (mode) {
-      case Mode.kNavigation:
-        this.navigationKeyMap[key] = action
+      case Mode.Command:
+        this.commandKeyMap[key] = action
         break
+      case Mode.Edit:
+        this.editKeyMap[key] = action
       default:
-        throw `Unrecognized mode ${mode}`
+        break
     }
   }
 
   // Selects argument by reference.
-  selectArgument(argument: flow.Argument) {
+  selectArgument(argument: Argument) {
     this.flow.selectArgument(argument);
   }
 
@@ -75,12 +84,43 @@ export class AppComponent extends OnInit {
   // @HostListener('keypress', ['$event'])
   keyPress(event: KeyboardEvent) {
     switch (this.mode) {
-      case Mode.kNavigation: {
-        if (!(event.key in this.navigationKeyMap)) return;
-        this.navigationKeyMap[event.key]()
+      case Mode.Command: {
+        if (!(event.key in this.commandKeyMap)) return;
+        event.preventDefault()
+        this.commandKeyMap[event.key]()
+        break
+      }
+      case Mode.Edit: {
+        if (!(event.key in this.editKeyMap)) return;
+        event.preventDefault()
+        this.editKeyMap[event.key]()
       }
       default:
         break
     }
+  }
+
+  createArgument(newGroup: boolean) {
+    const argument = this.flow.createArgument(
+        { contents: '' }, newGroup)
+    this.editArgument(argument)
+  }
+
+  editArgument(argument: Argument) {
+    this.mode = Mode.Edit
+    this.editModel.startEditing(
+      this.flow.findArgument(argument), argument.contents)
+  }
+
+  stopEditing() {
+    this.mode = Mode.Command
+    const argument = { contents: this.editModel.text }
+    this.flow.putArgument(argument)
+    this.editModel.stopEditing()
+  }
+
+  editText(text) {
+    console.log(`editText(${text}`)
+    this.editModel.text = text
   }
 }

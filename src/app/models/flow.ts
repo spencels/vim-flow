@@ -1,3 +1,4 @@
+// Flow data structures and operations.
 
 export interface Argument {
   contents: string
@@ -58,6 +59,7 @@ export class Flow {
       this.cursor = Cursor.EMPTY
       this.selectedArgument = null;
     }
+    return this.selectedArgument
   }
 
   // Sets cursor to provided coordinates.
@@ -284,7 +286,7 @@ export class Flow {
     speech.splice(iInsertArgumentAt, 0, argument)
 
     // Set cursor to new argument.
-    this.selectArgument(argument)  // TODO: Use moveCursor for performance
+    return this.selectArgument(argument)  // TODO: Use moveCursor for performance
   }
 
   private getOrCreateArgumentGroup(iArgumentGroup) {
@@ -310,6 +312,7 @@ export class Flow {
 
   // Replaces existing argument at cursor with the provided one.
   putArgument(argument: Argument) {
-    // TODO
+    this.getSpeechAtCursor()[this.cursor.iArgument] = argument
+    this.selectArgument(argument)
   }
 }
