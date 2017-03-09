@@ -43,7 +43,7 @@ export class Flow {
   // Places cursor in the default location, if cursor is not already set.
   // Returns true if cursor was set, or if cursor cannot be set.
   trySetDefaultCursor() {
-    if (this.cursor) return true;
+    if (this.cursor) return false;
 
     if (this.argumentGroups.length > 0
         && this.argumentGroups[0].length > 0
@@ -158,6 +158,12 @@ export class Flow {
       this.argumentGroups[iArgumentGroup].splice(iSpeech, 1);
     }
     this.cursor = null;
+
+    this.deleteArgumentGroupIfEmpty()
+  }
+
+  deleteArgumentGroupIfEmpty() {
+      // TODO: implement me.
   }
 
   countSpeeches() {
