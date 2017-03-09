@@ -2,6 +2,13 @@ import { Component, OnInit, HostListener } from '@angular/core';
 
 import * as flow from 'app/models/flow'
 
+type KeyMap = { [key: string]: () => void }
+
+enum Mode {
+  kNavigation,
+  kEditingMode
+}
+
 @Component({
   selector: 'app-root',
   template: `
@@ -15,8 +22,19 @@ import * as flow from 'app/models/flow'
 export class AppComponent extends OnInit {
   title = 'app works!';
   flow = new flow.Flow();
+  navigationKeyMap: KeyMap = {}
+  mode: Mode = Mode.kNavigation
 
   ngOnInit() {
+    // Map keyboard shortcuts
+    this.mapShortcut(Mode.kNavigation, 'j', this.flow.selectDown.bind(this.flow))
+    this.mapShortcut(Mode.kNavigation, 'k', this.flow.selectUp.bind(this.flow))
+    this.mapShortcut(Mode.kNavigation, 'l', this.flow.selectRight.bind(this.flow))
+    this.mapShortcut(Mode.kNavigation, 'h', this.flow.selectLeft.bind(this.flow))
+    this.mapShortcut(
+      Mode.kNavigation, 'd', this.flow.deleteArgumentAtCursor.bind(this.flow))
+
+    // Add some default data.
     this.flow.argumentGroups = [
       [
         [
@@ -36,26 +54,29 @@ export class AppComponent extends OnInit {
     ]
   }
 
+  // Maps keyboard shortcut.
+  mapShortcut(mode, key, action) {
+    switch (mode) {
+      case Mode.kNavigation:
+        this.navigationKeyMap[key] = action
+        break
+      default:
+        throw `Unrecognized mode ${mode}`
+    }
+  }
+
   // Selects argument by reference.
   selectArgument(argument: flow.Argument) {
     this.flow.selectArgument(argument);
   }
 
-  // @HostListener('keydown', ['$event'])
+  // @HostListener('keypress', ['$event'])
   keyPress(event: KeyboardEvent) {
-    switch (event.key) {
-      case 'j':
-        this.flow.selectDown();
-        break
-      case 'k':
-        this.flow.selectUp();
-        break
-      case 'l':
-        this.flow.selectRight()
-        break
-      case 'h':
-        this.flow.selectLeft()
-        break
+    switch (this.mode) {
+      case Mode.kNavigation: {
+        if (!(event.key in this.navigationKeyMap)) return;
+        this.navigationKeyMap[event.key]()
+      }
       default:
         break
     }

@@ -40,19 +40,25 @@ export class Flow {
         this.cursor = argument;
     }
 
+    // Places cursor in the default location, if cursor is not already set.
+    // Returns true if cursor was set, or if cursor cannot be set.
+    trySetDefaultCursor() {
+        if (this.cursor) return true;
+
+        if (this.argumentGroups.length > 0
+                && this.argumentGroups[0].length > 0
+                && this.argumentGroups[0][0].length > 0) {
+            this.cursor = this.argumentGroups[0][0][0];
+            return true;
+        }
+
+        return false;
+    }
+
     // Moves cursor down to next argument.
     selectDown() {
         // If nothing selected, select first argument.
-        if (!this.cursor) {
-            if (this.argumentGroups.length > 0
-                    && this.argumentGroups[0].length > 0
-                    && this.argumentGroups[0][0].length > 0) {
-                this.cursor = this.argumentGroups[0][0][0];
-                return;
-            } else {
-                return;
-            }
-        }
+        if (this.trySetDefaultCursor()) return;
 
         let { iArgumentGroup, iSpeech, iArgument } =
             this.findArgument(this.cursor)
@@ -80,16 +86,7 @@ export class Flow {
     // Moves cursor up to next argument.
     selectUp() {
         // If nothing selected, select first argument.
-        if (!this.cursor) {
-            if (this.argumentGroups.length > 0
-                    && this.argumentGroups[0].length > 0
-                    && this.argumentGroups[0][0].length > 0) {
-                this.cursor = this.argumentGroups[0][0][0];
-                return;
-            } else {
-                return;
-            }
-        }
+        if (this.trySetDefaultCursor()) return;
 
         let { iArgumentGroup, iSpeech, iArgument } =
             this.findArgument(this.cursor)
@@ -118,16 +115,7 @@ export class Flow {
     // Move cursor to the right.
     selectRight() {
         // If nothing selected, select first argument.
-        if (!this.cursor) {
-            if (this.argumentGroups.length > 0
-                    && this.argumentGroups[0].length > 0
-                    && this.argumentGroups[0][0].length > 0) {
-                this.cursor = this.argumentGroups[0][0][0];
-                return
-            } else {
-                return
-            }
-        }
+        if (this.trySetDefaultCursor()) return;
 
         let { iArgumentGroup, iSpeech, iArgument } =
             this.findArgument(this.cursor)
@@ -145,16 +133,7 @@ export class Flow {
     // Move cursor to the right.
     selectLeft() {
         // If nothing selected, select first argument.
-        if (!this.cursor) {
-            if (this.argumentGroups.length > 0
-                    && this.argumentGroups[0].length > 0
-                    && this.argumentGroups[0][0].length > 0) {
-                this.cursor = this.argumentGroups[0][0][0];
-                return
-            } else {
-                return
-            }
-        }
+        if (this.trySetDefaultCursor()) return;
 
         let { iArgumentGroup, iSpeech, iArgument } =
             this.findArgument(this.cursor)
