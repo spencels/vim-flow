@@ -9,16 +9,19 @@ import { Flow, Argument } from 'app/models/flow'
       <div class="argumentGroup"
            *ngFor="let argumentGroup of flow.argumentGroups; let iArgumentGroup = index">
         <div class="speech"
-             *ngFor="let speech of argumentGroup; let iSpeech = index">
+             (click)="selectSpeech.emit([iArgumentGroup, iSpeech])"
+             *ngFor="let iSpeech of getSpeechesRange()">
           <div class="empty-selected"
                *ngIf="isEmptySelection(iArgumentGroup, iSpeech)">
           </div>
-          <app-argument
-              *ngFor="let argument of speech"
-              [argument]="argument"
-              [selected]="isArgumentSelected(argument)"
-              (click)="selectArgument.emit(argument)">
-          </app-argument>
+          <template [ngIf]="iSpeech < argumentGroup.length">
+            <app-argument
+                *ngFor="let argument of argumentGroup[iSpeech]"
+                [argument]="argument"
+                [selected]="isArgumentSelected(argument)"
+                (click)="selectArgumentInternal($event, argument)">
+            </app-argument>
+          </template>
         </div>
       </div>
     </div>
@@ -52,8 +55,20 @@ import { Flow, Argument } from 'app/models/flow'
   `]
 })
 export class FlowComponent {
-  @Input() flow: Flow;
-  @Output() selectArgument = new EventEmitter();
+  @Input() flow: Flow
+  @Output() selectArgument = new EventEmitter()
+  @Output() selectSpeech = new EventEmitter()
+
+  private selectArgumentInternal(event: MouseEvent, argument: Argument) {
+    event.stopPropagation()
+    this.selectArgument.emit(argument)
+  }
+
+  // Returns array of increasing integers ([0, 1, ...]) whose length is equal to
+  // flow.speechesCount.
+  getSpeechesRange() {
+    return Array(this.flow.speechesCount + 1).fill(null).map((x, i) => i)
+  }
 
   isArgumentSelected(argument: Argument) {
     return Object.is(this.flow.selectedArgument, argument);

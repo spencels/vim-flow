@@ -71,10 +71,13 @@ export class Flow {
       // Invalid selection
       this.cursor = Cursor.EMPTY
     } else {
-      // TODO: Check for invalid speech numbers.
       // Select empty speech.
       this.cursor = new Cursor(iArgumentGroup, iSpeech, 0)
     }
+  }
+
+  selectSpeech(iArgumentGroup, iSpeech) {
+    this.moveCursor(iArgumentGroup, iSpeech, 0)
   }
 
   // Gets argument at coordinates, or null if it doesn't exist.
@@ -112,14 +115,18 @@ export class Flow {
     if (this.trySetDefaultCursor()) return;
 
     const { iArgumentGroup, iSpeech, iArgument } = this.cursor
-    if (iArgument + 1 < this.argumentGroups[iArgumentGroup][iSpeech].length) {
+    if (this.argumentGroups[iArgumentGroup][iSpeech]) {
+      const speechLength = this.argumentGroups[iArgumentGroup][iSpeech].length
+      if (iArgument + 1 < speechLength) {
         this.moveCursor(iArgumentGroup, iSpeech, iArgument + 1)
-      return;
+        return;
+      }
     }
 
-    // Move to next argument group.
+    // Don't move past last argument group.
+    if (iArgumentGroup + 1 >= this.argumentGroups.length) return;
+    
     this.moveCursor(iArgumentGroup + 1, iSpeech, 0)
-    return
   }
 
   // Moves cursor up to next argument.
@@ -150,7 +157,17 @@ export class Flow {
     if (this.trySetDefaultCursor()) return;
 
     const { iArgumentGroup, iSpeech, iArgument } = this.cursor
-    this.moveCursor(iArgumentGroup, iSpeech + 1, iArgument)
+
+    // Only allow cursor to go 1 speech past the max.
+    if (iSpeech + 1 >= this.speechesCount + 1) return;
+
+    // Adjust iArgument if new speech is smaller than the cursor. Set to 0 if
+    // no arguments are present.
+    const newSpeech = this.getSpeech(iArgumentGroup, iSpeech + 1)
+    const iNewArgument = newSpeech
+      ? (iArgument < newSpeech.length ? iArgument : newSpeech.length - 1)
+      : 0
+    this.moveCursor(iArgumentGroup, iSpeech + 1, iNewArgument)
   }
 
   // Move cursor to the right.
@@ -159,6 +176,8 @@ export class Flow {
     if (this.trySetDefaultCursor()) return;
 
     const { iArgumentGroup, iSpeech, iArgument } = this.cursor 
+
+    if (iSpeech - 1 < 0) return;
     this.moveCursor(iArgumentGroup, iSpeech - 1, iArgument)
   }
 

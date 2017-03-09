@@ -15,6 +15,7 @@ enum Mode {
     <app-flow 
       [flow]="flow"
       (selectArgument)="selectArgument($event)"
+      (selectSpeech)="selectSpeech($event)"
       (window:keypress)="keyPress($event)">
     </app-flow>
   `,
@@ -68,6 +69,12 @@ export class AppComponent extends OnInit {
   // Selects argument by reference.
   selectArgument(argument: flow.Argument) {
     this.flow.selectArgument(argument);
+  }
+
+  // Selects speech. Argument in form of [iArgumentGroup, iSpeech].
+  selectSpeech(speechCoordinate: Array<number>) {
+    const [ iArgumentGroup, iSpeech ] = speechCoordinate
+    this.flow.selectSpeech(iArgumentGroup, iSpeech)
   }
 
   // @HostListener('keypress', ['$event'])
