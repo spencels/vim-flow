@@ -11,12 +11,18 @@ import { Argument } from 'app/models/flow'
   `,
 
   styles: [`
+    :host {
+      box-sizing: border-box;
+    }
     .argument {
+      width: 12em;
+      padding: 0.5em;
+      font-size: small;
     }
 
     .argument-selected {
-      border: solid 0.5em;
-      border-color: red;
+      border: solid 0.2em;
+      border-color: lightblue;
     }
   `]
 })

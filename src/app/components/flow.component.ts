@@ -21,7 +21,7 @@ import { Flow, Argument } from 'app/models/flow'
   `,
 
   styles: [`
-    * {
+    :host {
       box-sizing: border-box;
     }
 
@@ -31,12 +31,13 @@ import { Flow, Argument } from 'app/models/flow'
 
     .argumentGroup {
       display: table-row;
-      border-bottom: 0.25em solid #000;
     }
 
     .speech {
       display: table-cell;
       margin: 1em;
+      padding: 0.7em;
+      border-bottom: 0.25em solid;
     }
 
   `]
