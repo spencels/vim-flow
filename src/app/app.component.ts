@@ -43,16 +43,21 @@ export class AppComponent extends OnInit {
 
   // @HostListener('keydown', ['$event'])
   keyPress(event: KeyboardEvent) {
-    console.log('Key event ' + event.key);
     switch (event.key) {
       case 'j':
         this.flow.selectDown();
-        break;
+        break
       case 'k':
         this.flow.selectUp();
-        break;
+        break
+      case 'l':
+        this.flow.selectRight()
+        break
+      case 'h':
+        this.flow.selectLeft()
+        break
       default:
-        break;
+        break
     }
   }
 }

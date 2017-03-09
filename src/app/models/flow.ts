@@ -115,6 +115,59 @@ export class Flow {
         }
     }
 
+    // Move cursor to the right.
+    selectRight() {
+        // If nothing selected, select first argument.
+        if (!this.cursor) {
+            if (this.argumentGroups.length > 0
+                    && this.argumentGroups[0].length > 0
+                    && this.argumentGroups[0][0].length > 0) {
+                this.cursor = this.argumentGroups[0][0][0];
+                return
+            } else {
+                return
+            }
+        }
+
+        let { iArgumentGroup, iSpeech, iArgument } =
+            this.findArgument(this.cursor)
+    
+        iSpeech += 1
+        const speechesCount = this.argumentGroups[iArgumentGroup].length
+        if (iSpeech < speechesCount) {
+            // Move to same argument if it exists.
+            const argumentsCount = this.argumentGroups[iArgumentGroup][iSpeech].length
+            if (iArgument >= argumentsCount) iArgument = argumentsCount - 1
+            this.cursor = this.argumentGroups[iArgumentGroup][iSpeech][iArgument]
+        }
+    }
+
+    // Move cursor to the right.
+    selectLeft() {
+        // If nothing selected, select first argument.
+        if (!this.cursor) {
+            if (this.argumentGroups.length > 0
+                    && this.argumentGroups[0].length > 0
+                    && this.argumentGroups[0][0].length > 0) {
+                this.cursor = this.argumentGroups[0][0][0];
+                return
+            } else {
+                return
+            }
+        }
+
+        let { iArgumentGroup, iSpeech, iArgument } =
+            this.findArgument(this.cursor)
+    
+        iSpeech -= 1
+        if (iSpeech >= 0) {
+            // Move to same argument if it exists.
+            const argumentsCount = this.argumentGroups[iArgumentGroup][iSpeech].length
+            if (iArgument >= argumentsCount) iArgument = argumentsCount - 1
+            this.cursor = this.argumentGroups[iArgumentGroup][iSpeech][iArgument]
+        }
+    }
+
     // Finds (argumentGroup, speech, argument) index tuple for the given argument.
     // Returns null if not found.
     deleteArgumentAtCursor() {
