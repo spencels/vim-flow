@@ -27,6 +27,10 @@ export class Flow {
   // Selected argument, or null if no argument is present at coordinates.
   selectedArgument: Argument | null = null;
 
+  // Number of speeches. This is used to determine how far right the cursor can
+  // move.
+  speechesCount: number = 2
+
   findArgument(argument: Argument) {
     for (var iGroup = 0; iGroup < this.argumentGroups.length; iGroup++) {
       let argumentGroup = this.argumentGroups[iGroup];
@@ -59,11 +63,21 @@ export class Flow {
   // Sets cursor to provided coordinates.
   moveCursor(iArgumentGroup, iSpeech, iArgument) {
     this.selectedArgument = this.getArgument(iArgumentGroup, iSpeech, iArgument)
-    this.cursor = new Cursor(iArgumentGroup, iSpeech, iArgument)
-    
+    if (this.selectedArgument) {
+      this.cursor = new Cursor(iArgumentGroup, iSpeech, iArgument)
+    }
+    else if (iArgumentGroup < 0
+        || iArgumentGroup > this.argumentGroups.length) {
+      // Invalid selection
+      this.cursor = Cursor.EMPTY
+    } else {
+      // TODO: Check for invalid speech numbers.
+      // Select empty speech.
+      this.cursor = new Cursor(iArgumentGroup, iSpeech, 0)
+    }
   }
 
-  // Gets argument at cursor, or null if it doesn't exist.
+  // Gets argument at coordinates, or null if it doesn't exist.
   getArgument(iArgumentGroup: number, iSpeech: number, iArgument: number) {
     if (iArgumentGroup >= this.argumentGroups.length
         || iSpeech >= this.argumentGroups[iArgumentGroup].length
@@ -74,19 +88,22 @@ export class Flow {
     return speech[iArgument]
   }
 
+  // Gets speech at coordinates, or null if it doesn't exist.
+  getSpeech(iArgumentGroup: number, iSpeech: number) {
+    if (iArgumentGroup >= this.argumentGroups.length
+        || iSpeech >= this.argumentGroups[iArgumentGroup].length) {
+      return null
+    }
+    return this.argumentGroups[iArgumentGroup][iSpeech]
+  }
+
   // Places cursor in the default location, if cursor is not already set.
   // Returns true if cursor was set, or if cursor cannot be set.
   trySetDefaultCursor() {
-    if (this.selectedArgument) return false;
+    if (this.cursor !== Cursor.EMPTY) return false;
 
-    if (this.argumentGroups.length > 0
-        && this.argumentGroups[0].length > 0
-        && this.argumentGroups[0][0].length > 0) {
-      this.selectedArgument = this.argumentGroups[0][0][0];
-      return true;
-    }
-
-    return false;
+    this.moveCursor(0, 0, 0)
+    return this.cursor !== Cursor.EMPTY
   }
 
   // Moves cursor down to next argument.
@@ -94,27 +111,15 @@ export class Flow {
     // If nothing selected, select first argument.
     if (this.trySetDefaultCursor()) return;
 
-    let { iArgumentGroup, iSpeech, iArgument } =
-      this.findArgument(this.selectedArgument)
-    
-    iArgument += 1;
-    if (iArgument < this.argumentGroups[iArgumentGroup][iSpeech].length) {
-        this.moveCursor(iArgumentGroup, iSpeech, iArgument)
+    const { iArgumentGroup, iSpeech, iArgument } = this.cursor
+    if (iArgument + 1 < this.argumentGroups[iArgumentGroup][iSpeech].length) {
+        this.moveCursor(iArgumentGroup, iSpeech, iArgument + 1)
       return;
     }
 
     // Move to next argument group.
-    iArgumentGroup += 1;
-    while (iArgumentGroup < this.argumentGroups.length) {
-      let hasSpeech = iSpeech < this.argumentGroups[iArgumentGroup].length
-      if (hasSpeech) {
-        if (this.argumentGroups[iArgumentGroup][iSpeech].length > 0) {
-          this.moveCursor(iArgumentGroup, iSpeech, 0)
-          return;
-        }
-      }
-      iArgumentGroup += 1;
-    }
+    this.moveCursor(iArgumentGroup + 1, iSpeech, 0)
+    return
   }
 
   // Moves cursor up to next argument.
@@ -122,28 +127,21 @@ export class Flow {
     // If nothing selected, select first argument.
     if (this.trySetDefaultCursor()) return;
 
-    let { iArgumentGroup, iSpeech, iArgument } =
-      this.findArgument(this.selectedArgument)
+    const { iArgumentGroup, iSpeech, iArgument } = this.cursor
     
-    iArgument -= 1;
-    if (iArgument >= 0) {
-      this.moveCursor(iArgumentGroup, iSpeech, iArgument)
+    if (iArgument >= 1) {
+      this.moveCursor(iArgumentGroup, iSpeech, iArgument - 1)
       return;
     }
 
+    // If this is the top argument group, move no farther.
+    if (iArgumentGroup == 0) return;
+
     // Move to next argument group.
-    iArgumentGroup -= 1;
-    while (iArgumentGroup >= 0) {
-      let hasSpeech = iSpeech < this.argumentGroups[iArgumentGroup].length
-      if (hasSpeech) {
-        const speechLength = this.argumentGroups[iArgumentGroup][iSpeech].length 
-        if (speechLength > 0) {
-          this.moveCursor(iArgumentGroup, iSpeech, speechLength - 1)
-          return;
-        }
-      }
-      iArgumentGroup -= 1;
-    }
+    const iNextArgumentGroup = iArgumentGroup - 1
+    const nextSpeech = this.getSpeech(iNextArgumentGroup, iSpeech)
+    const iNextArgument = nextSpeech ? nextSpeech.length - 1 : 0
+    this.moveCursor(iArgumentGroup - 1, iSpeech, iNextArgument);
   }
 
   // Move cursor to the right.
@@ -151,18 +149,8 @@ export class Flow {
     // If nothing selected, select first argument.
     if (this.trySetDefaultCursor()) return;
 
-    let { iArgumentGroup, iSpeech, iArgument } =
-      this.findArgument(this.selectedArgument)
-  
-    iSpeech += 1
-    const speechesCount = this.argumentGroups[iArgumentGroup].length
-    if (iSpeech < speechesCount) {
-      // Move to same argument if it exists.
-      const argumentsCount = this.argumentGroups[iArgumentGroup][iSpeech].length
-      if (iArgument >= argumentsCount) iArgument = argumentsCount - 1
-      this.selectedArgument = this.argumentGroups[iArgumentGroup][iSpeech][iArgument]
-      this.moveCursor(iArgumentGroup, iSpeech, iArgument)
-    }
+    const { iArgumentGroup, iSpeech, iArgument } = this.cursor
+    this.moveCursor(iArgumentGroup, iSpeech + 1, iArgument)
   }
 
   // Move cursor to the right.
@@ -170,39 +158,57 @@ export class Flow {
     // If nothing selected, select first argument.
     if (this.trySetDefaultCursor()) return;
 
-    let { iArgumentGroup, iSpeech, iArgument } =
-      this.findArgument(this.selectedArgument)
-  
-    iSpeech -= 1
-    if (iSpeech >= 0) {
-      // Move to same argument if it exists.
-      const argumentsCount = this.argumentGroups[iArgumentGroup][iSpeech].length
-      if (iArgument >= argumentsCount) iArgument = argumentsCount - 1
-      this.moveCursor(iArgumentGroup, iSpeech, iArgument)
-    }
+    const { iArgumentGroup, iSpeech, iArgument } = this.cursor 
+    this.moveCursor(iArgumentGroup, iSpeech - 1, iArgument)
   }
 
   // Finds (argumentGroup, speech, argument) index tuple for the given argument.
   // Returns null if not found.
   deleteArgumentAtCursor() {
     if (this.selectedArgument == null) throw "null cursor"
-    let { iArgumentGroup, iSpeech, iArgument } =
-      this.findArgument(this.selectedArgument);
-    this.argumentGroups[iArgumentGroup][iSpeech].splice(iArgument, 1);
-    if (this.argumentGroups[iArgumentGroup][iSpeech].length == 0) {
-      this.argumentGroups[iArgumentGroup].splice(iSpeech, 1);
-    }
-    this.selectArgument(null)
 
-    this.deleteArgumentGroupIfEmpty()
+    let { iArgumentGroup, iSpeech, iArgument } = this.cursor
+
+    this.argumentGroups[iArgumentGroup][iSpeech].splice(iArgument, 1);
+
+    this.selectArgument(null)
+    this.deleteArgumentGroupIfEmpty(iArgumentGroup)
+
+    // If argument was the last argument in the last speech, recalculate speeches
+    this.speechesCount = this.countSpeeches()
   }
 
-  deleteArgumentGroupIfEmpty() {
-      // TODO: implement me.
+  deleteArgumentGroupIfEmpty(iArgumentGroup: number) {
+    // Don't delete the last group.
+    if (this.argumentGroups.length <= 1) return;
+
+    const argumentGroupIsEmpty = this.argumentGroups[iArgumentGroup]
+      .every(speech => speech.length == 0)
+    if (argumentGroupIsEmpty) {
+      this.argumentGroups.splice(iArgumentGroup, 1)
+    }
+
+    // Move cursor.
+    this.selectArgument(null)
   }
 
   countSpeeches() {
     return this.argumentGroups.map(x => x.length)
       .reduce((acc, val) => Math.max(acc, val));
+  }
+
+  // Returns the maximum number of speeches held by an argument group. Does not
+  // count speeches without arguments.
+  calculateSpeechesCount() {
+    return this.argumentGroups.reduce(
+      (accumulator, argumentGroup) => {
+        // Find group length, ignoring speeches that are empty.
+        let speechCount = argumentGroup.length
+        while (speechCount > 0 && argumentGroup[speechCount - 1].length == 0) {
+          speechCount -= 1
+        }
+        return Math.max(accumulator, speechCount)
+      },
+      0)
   }
 }

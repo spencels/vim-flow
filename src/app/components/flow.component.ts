@@ -7,13 +7,17 @@ import { Flow, Argument } from 'app/models/flow'
   template: `
     <div class="flow-container">
       <div class="argumentGroup"
-           *ngFor="let argumentGroup of flow.argumentGroups">
-        <div class="speech" *ngFor="let speech of argumentGroup">
+           *ngFor="let argumentGroup of flow.argumentGroups; let iArgumentGroup = index">
+        <div class="speech"
+             *ngFor="let speech of argumentGroup; let iSpeech = index">
+          <div class="empty-selected"
+               *ngIf="isEmptySelection(iArgumentGroup, iSpeech)">
+          </div>
           <app-argument
-            *ngFor="let argument of speech"
-            [argument]="argument"
-            [selected]="isArgumentSelected(argument)"
-            (click)="selectArgument.emit(argument)">
+              *ngFor="let argument of speech"
+              [argument]="argument"
+              [selected]="isArgumentSelected(argument)"
+              (click)="selectArgument.emit(argument)">
           </app-argument>
         </div>
       </div>
@@ -40,6 +44,11 @@ import { Flow, Argument } from 'app/models/flow'
       border-bottom: 0.25em solid;
     }
 
+    .empty-selected {
+      height: 1em;
+      width: 9em;
+      background-color: lightblue;
+    }
   `]
 })
 export class FlowComponent {
@@ -48,5 +57,12 @@ export class FlowComponent {
 
   isArgumentSelected(argument: Argument) {
     return Object.is(this.flow.selectedArgument, argument);
+  }
+
+  // True if empty speech is selected.
+  isEmptySelection(iArgumentGroup: number, iSpeech: number) {
+    return this.flow.selectedArgument == null
+      && this.flow.cursor.iArgumentGroup == iArgumentGroup
+      && this.flow.cursor.iSpeech == iSpeech
   }
 }
