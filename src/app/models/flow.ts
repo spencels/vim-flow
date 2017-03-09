@@ -184,6 +184,29 @@ export class Flow {
     this.moveCursor(iArgumentGroup, iSpeech - 1, iArgument)
   }
 
+  // Move argument at cursor to new speech. 
+  moveArgument(x: number, y: number) {
+    const iNewArgumentGroup = this.cursor.iArgumentGroup + y
+    const iNewSpeech = this.cursor.iSpeech + x
+
+    // Ignore invalid moves.
+    if (iNewArgumentGroup < 0 || iNewSpeech < 0) return;
+
+    const oldSpeech = this.getSpeechAtCursor()
+    const [argument] = oldSpeech.splice(this.cursor.iArgument)
+
+    const argumentGroup = this.getOrCreateArgumentGroup(iNewArgumentGroup)
+    const speech = this.getOrCreateSpeech(iNewArgumentGroup, iNewSpeech)
+    speech.push(argument)
+    this.selectArgument(argument)
+  }
+
+  // Rearrange argument within a speech. Positive "direction" is down, negative
+  // is up.
+  moveArgumentInSpeech(direction: number) {
+    // TODO
+  }
+
   // Finds (argumentGroup, speech, argument) index tuple for the given argument.
   // Returns null if not found.
   deleteArgumentAtCursor() {
@@ -242,16 +265,16 @@ export class Flow {
     let iInsertAt
     if (newGroup) {
       const newArgumentGroup = this.argumentGroups.push([])
-      speech =
-        this.createSpeech(this.cursor.iArgumentGroup + 1, this.cursor.iSpeech)
+      speech = this.getOrCreateSpeech(
+        this.cursor.iArgumentGroup + 1, this.cursor.iSpeech)
       iInsertAt = 0
     } else {
       speech = this.getSpeechAtCursor()
       if (speech) {
         iInsertAt = this.cursor.iArgument + 1
       } else {
-        speech =
-          this.createSpeech(this.cursor.iArgumentGroup, this.cursor.iSpeech)
+        speech = this.getOrCreateSpeech(
+          this.cursor.iArgumentGroup, this.cursor.iSpeech)
         iInsertAt = 0
       }
     }
@@ -259,17 +282,25 @@ export class Flow {
 
     // Set cursor to new argument.
     this.selectArgument(argument)  // TODO: Use moveCursor for performance
-
-    // Update speeches count if this is a new speech.
-    if (this.cursor.iSpeech >= this.speechesCount - 1) {
-      this.speechesCount = this.calculateSpeechesCount()
-    }
   }
 
-  private createSpeech(iArgumentGroup, iSpeech) {
+  private getOrCreateArgumentGroup(iArgumentGroup) {
+    for (let i = this.argumentGroups.length; i < iArgumentGroup + 1; i++) {
+      this.argumentGroups.push([])
+    }
+    return this.argumentGroups[iArgumentGroup]
+  }
+
+  // Creates speech only, not argument group.
+  private getOrCreateSpeech(iArgumentGroup, iSpeech) {
     const argumentGroup = this.argumentGroups[iArgumentGroup]
     for (let i = argumentGroup.length; i <= iSpeech; i++) {
       argumentGroup.push([])
+    }
+
+    // Update speeches count if this is a new speech.
+    if (iSpeech >= this.speechesCount - 1) {
+      this.speechesCount = this.calculateSpeechesCount()
     }
     return argumentGroup[iSpeech]
   }

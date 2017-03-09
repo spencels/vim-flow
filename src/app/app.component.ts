@@ -26,14 +26,26 @@ export class AppComponent extends OnInit {
   navigationKeyMap: KeyMap = {}
   mode: Mode = Mode.kNavigation
 
+  // TODO: Delete after implementing argument editing.
+  argumentCounter = 0
+
   ngOnInit() {
     // Map keyboard shortcuts
+    let createArgument = (newGroup) =>
+      this.flow.createArgument(
+        { contents: `New arg ${this.argumentCounter}` }, newGroup)
+    let moveArgument = (x, y) => this.flow.moveArgument(x, y)
+
     this.mapShortcut(Mode.kNavigation, 'j', this.flow.selectDown.bind(this.flow))
     this.mapShortcut(Mode.kNavigation, 'k', this.flow.selectUp.bind(this.flow))
     this.mapShortcut(Mode.kNavigation, 'l', this.flow.selectRight.bind(this.flow))
     this.mapShortcut(Mode.kNavigation, 'h', this.flow.selectLeft.bind(this.flow))
-    this.mapShortcut(Mode.kNavigation, 'n', () => this.createArgument(false))
-    this.mapShortcut(Mode.kNavigation, 'N', () => this.createArgument(true))
+    this.mapShortcut(Mode.kNavigation, 'J', () => moveArgument(0, 1))
+    this.mapShortcut(Mode.kNavigation, 'K', () => moveArgument(0, -1))
+    this.mapShortcut(Mode.kNavigation, 'L', () => moveArgument(1, 0))
+    this.mapShortcut(Mode.kNavigation, 'H', () => moveArgument(-1, 0))
+    this.mapShortcut(Mode.kNavigation, 'n', () => createArgument(false))
+    this.mapShortcut(Mode.kNavigation, 'N', () => createArgument(true))
     this.mapShortcut(
       Mode.kNavigation, 'd', this.flow.deleteArgumentAtCursor.bind(this.flow))
 
@@ -89,12 +101,5 @@ export class AppComponent extends OnInit {
       default:
         break
     }
-  }
-
-  argumentCounter = 0
-
-  createArgument(newGroup: boolean) {
-    this.flow.createArgument(
-      { contents: `New arg ${this.argumentCounter}` }, newGroup)
   }
 }
