@@ -32,6 +32,8 @@ export class AppComponent extends OnInit {
     this.mapShortcut(Mode.kNavigation, 'k', this.flow.selectUp.bind(this.flow))
     this.mapShortcut(Mode.kNavigation, 'l', this.flow.selectRight.bind(this.flow))
     this.mapShortcut(Mode.kNavigation, 'h', this.flow.selectLeft.bind(this.flow))
+    this.mapShortcut(Mode.kNavigation, 'n', () => this.createArgument(false))
+    this.mapShortcut(Mode.kNavigation, 'N', () => this.createArgument(true))
     this.mapShortcut(
       Mode.kNavigation, 'd', this.flow.deleteArgumentAtCursor.bind(this.flow))
 
@@ -87,5 +89,12 @@ export class AppComponent extends OnInit {
       default:
         break
     }
+  }
+
+  argumentCounter = 0
+
+  createArgument(newGroup: boolean) {
+    this.flow.createArgument(
+      { contents: `New arg ${this.argumentCounter}` }, newGroup)
   }
 }

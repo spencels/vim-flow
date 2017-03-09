@@ -100,6 +100,9 @@ export class Flow {
     return this.argumentGroups[iArgumentGroup][iSpeech]
   }
 
+  getSpeechAtCursor() {
+    return this.getSpeech(this.cursor.iArgumentGroup, this.cursor.iSpeech)
+  }
   // Places cursor in the default location, if cursor is not already set.
   // Returns true if cursor was set, or if cursor cannot be set.
   trySetDefaultCursor() {
@@ -184,7 +187,7 @@ export class Flow {
   // Finds (argumentGroup, speech, argument) index tuple for the given argument.
   // Returns null if not found.
   deleteArgumentAtCursor() {
-    if (this.selectedArgument == null) throw "null cursor"
+    if (this.selectedArgument == null) return;  // TODO: throw error
 
     let { iArgumentGroup, iSpeech, iArgument } = this.cursor
 
@@ -229,5 +232,50 @@ export class Flow {
         return Math.max(accumulator, speechCount)
       },
       0)
+  }
+
+  // Places a new argument at cursor and moves cursor to it. If `newGroup` is
+  // true, creates a new argumentGroup.
+  createArgument(argument: Argument, newGroup: boolean) {
+    // Find or create speech.
+    let speech: Speech
+    let iInsertAt
+    if (newGroup) {
+      const newArgumentGroup = this.argumentGroups.push([])
+      speech =
+        this.createSpeech(this.cursor.iArgumentGroup + 1, this.cursor.iSpeech)
+      iInsertAt = 0
+    } else {
+      speech = this.getSpeechAtCursor()
+      if (speech) {
+        iInsertAt = this.cursor.iArgument + 1
+      } else {
+        speech =
+          this.createSpeech(this.cursor.iArgumentGroup, this.cursor.iSpeech)
+        iInsertAt = 0
+      }
+    }
+    speech.splice(iInsertAt, 0, argument)
+
+    // Set cursor to new argument.
+    this.selectArgument(argument)  // TODO: Use moveCursor for performance
+
+    // Update speeches count if this is a new speech.
+    if (this.cursor.iSpeech >= this.speechesCount - 1) {
+      this.speechesCount = this.calculateSpeechesCount()
+    }
+  }
+
+  private createSpeech(iArgumentGroup, iSpeech) {
+    const argumentGroup = this.argumentGroups[iArgumentGroup]
+    for (let i = argumentGroup.length; i <= iSpeech; i++) {
+      argumentGroup.push([])
+    }
+    return argumentGroup[iSpeech]
+  }
+
+  // Replaces existing argument at cursor with the provided one.
+  putArgument(argument: Argument) {
+    // TODO
   }
 }
