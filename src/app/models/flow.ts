@@ -54,12 +54,6 @@ export class Flow {
     return null
   }
 
-  // Count max number of speeches with arguments in an argument group.
-  countSpeeches() {
-    return this.argumentGroups.map(x => x.length)
-      .reduce((acc, val) => Math.max(acc, val));
-  }
-
   // Gets argument at coordinates, or null if it doesn't exist.
   getArgument(iArgumentGroup: number, iSpeech: number, iArgument: number) {
     if (iArgumentGroup < 0) {
@@ -220,11 +214,12 @@ export class Flow {
     const argumentGroup = this.getOrCreateArgumentGroup(iNewArgumentGroup)
     const speech = this.getOrCreateSpeech(iNewArgumentGroup, iNewSpeech)
     speech.push(argument)
+    const iOldSpeech = this.cursor.iSpeech
     this.selectArgument(argument)
 
-    // Update speeches count if this is a new speech.
-    if (this.cursor.iSpeech + 1 >= this.speechesCount) {
-      this.speechesCount = this.calculateSpeechesCount()
+    // Update speeches count if modifying the last speech.
+    if (iOldSpeech + 1 == this.speechesCount) {
+      this.updateSpeechCount()
     }
   }
 
@@ -247,7 +242,10 @@ export class Flow {
     this.deleteArgumentGroupIfEmpty(iArgumentGroup)
 
     // If argument was the last argument in the last speech, recalculate speeches
-    this.speechesCount = this.countSpeeches()
+    // Update speeches count if modifying the last speech.
+    if (iSpeech + 1 == this.speechesCount) {
+      this.updateSpeechCount()
+    }
   }
 
   // Replaces existing argument at cursor with the provided one.
@@ -282,6 +280,10 @@ export class Flow {
     }
     speech.splice(iInsertArgumentAt, 0, argument)
 
+    if (this.cursor.iSpeech + 1 >= this.speechesCount) {
+      this.updateSpeechCount()
+    }
+
     // Set cursor to new argument.
     return this.selectArgument(argument)  // TODO: Use moveCursor for performance
   }
@@ -304,7 +306,7 @@ export class Flow {
 
   // Returns the maximum number of speeches held by an argument group. Does not
   // count speeches without arguments.
-  private calculateSpeechesCount() {
+  private countSpeeches() {
     return this.argumentGroups.reduce(
       (accumulator, argumentGroup) => {
         // Find group length, ignoring speeches that are empty.
@@ -317,6 +319,21 @@ export class Flow {
       0)
   }
 
+  // Updates speech count and prunes extra speeches if necessary.
+  private updateSpeechCount() {
+    const oldSpeechesCount = this.speechesCount
+    this.speechesCount = this.countSpeeches()
+    if (this.speechesCount >= oldSpeechesCount) return
+
+    // Recalculate speech count and prune empty speeches.
+    for (let argumentGroup of this.argumentGroups) {
+      if (argumentGroup.length > this.speechesCount) {
+        argumentGroup.splice(
+          this.speechesCount, argumentGroup.length - this.speechesCount)
+      }
+    }
+  }
+
   private getOrCreateArgumentGroup(iArgumentGroup) {
     for (let i = this.argumentGroups.length; i < iArgumentGroup + 1; i++) {
       this.argumentGroups.push([])
@@ -325,7 +342,7 @@ export class Flow {
   }
 
   // Creates speech only, not argument group.
-  private getOrCreateSpeech(iArgumentGroup, iSpeech) {
+private getOrCreateSpeech(iArgumentGroup, iSpeech) {
     const argumentGroup = this.argumentGroups[iArgumentGroup]
     for (let i = argumentGroup.length; i <= iSpeech; i++) {
       argumentGroup.push([])

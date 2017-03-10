@@ -25,7 +25,7 @@ const arg2 = arg('arg2')
 const arg3 = arg('arg3')
 
 // Tests accessors
-describe('Flow - accessors', () => {
+describe('Flow', () => {
   let flow: Flow
   beforeEach(() => {
     flow = new Flow()
@@ -67,6 +67,17 @@ describe('Flow - accessors', () => {
     expect(flow.findArgument(arg1)).toEqual(new Cursor(1, 0, 0))
   })
 
+  // countSpeeches (tested through setArgumentGroups)
+
+  it('countSpeeches should not count empty speeches', () => {
+    flow.setArgumentGroups([
+      group(speech(), speech(arg1)),
+      group(speech(), speech(), speech())
+    ])
+
+    expect(flow.speechesCount).toEqual(2)
+  })
+
   // getArgument
 
   it('getArgument returns null for non-existent argument', () => {
@@ -83,12 +94,29 @@ describe('Flow - accessors', () => {
   it('getArgument does not crash for out-of-bounds coordinates', () => {
     expect(flow.getArgument(4, 4, 4)).toBe(null)
   })
-})
 
-describe('Flow', () => {
-  let flow: Flow
-  beforeEach(() => {
-    flow = new Flow()
+  // createArgument
+
+  it('createArguent updates speech count', () => {
+    flow.createArgument(arg1, false)
+    expect(flow.speechesCount).toEqual(1)
+
+    flow.moveCursor(0, 1, 0)
+    flow.createArgument(arg2, false)
+    expect(flow.speechesCount).toEqual(2)
+  })
+
+  // deleteArgumentAtCursor
+
+  it('deleteArgumentAtCursor garbage collects excess speeches', () => {
+    flow.setArgumentGroups([
+      group(speech(arg1), speech(arg2), speech(arg3)),
+      group(speech(), speech(), speech(), speech())
+    ])
+
+    flow.selectArgument(arg3)
+    flow.deleteArgumentAtCursor()
+    expect(flow.speechesCount).toEqual(2)
   })
 
   // moveCursor
@@ -106,6 +134,33 @@ describe('Flow', () => {
     flow.moveArgument(1, 0)
     flow.moveArgument(1, 0)
     expect(flow.speechesCount).toEqual(3)
+  })
+
+  it('moveArgument should garbage collect speeches', () => {
+    flow.setArgumentGroups([
+      group(speech(), speech(arg1)),
+      group(speech(), speech(), speech())
+    ])
+
+    // Remove speeches when there are two extra.
+    flow.selectArgument(arg1)
+    flow.moveArgument(-1, 0)
+    expect(flow.speechesCount).toEqual(1)
+    expect(flow.argumentGroups[0].length).toEqual(1)
+    expect(flow.argumentGroups[1].length).toEqual(1)
+  })
+
+  it('moveArgument should not garbage collect speeches when moving middle arg', () => {
+    flow.setArgumentGroups([
+      group(speech(arg1), speech()),
+      group()
+    ])
+    flow.speechesCount = 2
+
+    flow.selectArgument(arg1)
+    flow.moveArgument(0, 1)
+    expect(flow.speechesCount).toEqual(2)
+    expect(flow.argumentGroups[0].length).toEqual(2)
   })
 
   // select*
