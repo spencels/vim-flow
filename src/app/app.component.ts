@@ -52,7 +52,10 @@ export class AppComponent extends OnInit {
     this.mapShortcut(Mode.Command, 'N', () => this.createArgument(true))
     this.mapShortcut(
       Mode.Command, 'd', this.flow.deleteArgumentAtCursor.bind(this.flow))
-    this.mapShortcut(Mode.Command, 'e', () => this.editArgument(this.flow.selectedArgument))
+    this.mapShortcut(
+      Mode.Command, 'e', () => this.editArgument())
+    this.mapShortcut(
+      Mode.Command, 's', () => this.editArgument(true))
 
     this.mapShortcut(Mode.Edit, 'Enter', () => this.stopEditing())
   }
@@ -103,13 +106,15 @@ export class AppComponent extends OnInit {
   createArgument(newGroup: boolean) {
     const argument = this.flow.createArgument(
         { contents: '' }, newGroup)
-    this.editArgument(argument)
+    this.editArgument(false)
   }
 
-  editArgument(argument: Argument) {
+  editArgument(overwriteContents: boolean = false) {
+    if (!this.flow.selectedArgument) return;
     this.mode = Mode.Edit
     this.editModel.startEditing(
-      this.flow.findArgument(argument), argument.contents)
+      this.flow.cursor,
+      overwriteContents ? '' :  this.flow.selectedArgument.contents)
   }
 
   stopEditing() {

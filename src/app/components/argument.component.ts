@@ -6,7 +6,9 @@ import { Argument } from 'app/models/flow'
 @Component({
   selector: 'app-argument',
   template: `
-    <md-card class="argument" [ngClass]="{'argument-selected':  selected}">
+    <md-card
+      class="argument"
+      [ngClass]="{'argument-selected':  selected, 'argument-editing': editing}">
       <template [ngIf]="!editing">
         {{ argument.contents }}
       </template>
@@ -14,7 +16,7 @@ import { Argument } from 'app/models/flow'
         class="argument-input"
         *ngIf="editing"
         [focus]="focusInput"
-        [value]="argument.contents"
+        [value]="editorText"
         (keypress)="editText.emit($event.target.value)" />
     </md-card>
   `,
@@ -34,9 +36,18 @@ import { Argument } from 'app/models/flow'
       border-color: lightblue;
     }
 
+    .argument-editing {
+      background-color: lightgreen;
+    }
+
     .argument-input {
       width: 100%;
       border: none;
+      background: transparent;
+      outline-width: 0;
+      font-family: Roboto,"Helvetica Neue",sans-serif;
+      font-size: small;
+      padding: 0;
     }
   `],
 })
@@ -45,6 +56,7 @@ export class ArgumentComponent implements OnChanges {
   @Input() argument = <Argument>null
   @Input() selected: boolean
   @Input() editing: boolean
+  @Input() editorText: string
   @Output() editText = new EventEmitter()
   
   inputText: string

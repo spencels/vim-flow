@@ -21,6 +21,7 @@ import { EditModel } from 'app/models/edit'
                 [argument]="argument"
                 [selected]="isArgumentSelected(argument)"
                 [editing]="isEditing(iArgumentGroup, iSpeech, iArgument)"
+                [editorText]="editModel.text"
                 (editText)="editText.emit($event)"
                 (click)="selectArgumentInternal($event, argument)">
             </app-argument>
