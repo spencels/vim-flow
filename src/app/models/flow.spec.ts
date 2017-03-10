@@ -199,6 +199,24 @@ describe('Flow', () => {
     expect(flow.selectedArgument).toBeNull()
   })
 
+  it('selectUp/Down into nonexistent speech', () => {
+    flow.setArgumentGroups([
+      group(),
+      group()
+    ])
+
+    flow.moveCursor(0, 0, 0)
+    flow.selectDown()
+    expect(flow.cursor).toEqual(new Cursor(1, 0, 0))
+    expect(flow.selectedArgument).toBeNull()
+
+    flow.moveCursor(1, 0, 0)
+    flow.selectUp()
+    expect(flow.cursor).toEqual(new Cursor(0, 0, 0))
+    expect(flow.selectedArgument).toBeNull()
+  })
+
+
   it('selectLeft/Right from empty argument group should not crash', () => {
     flow.setArgumentGroups([group()])
     flow.selectRight()

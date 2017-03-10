@@ -47,7 +47,7 @@ import { EditModel } from 'app/models/edit'
       display: table-cell;
       margin: 1em;
       padding: 0.7em;
-      border-bottom: 0.25em solid;
+      border-bottom: 0.20em solid gray;
       border-left: 0.1em dotted;
       border-right: 0.1em dotted;
       min-width: 6em

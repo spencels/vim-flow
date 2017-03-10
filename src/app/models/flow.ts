@@ -165,7 +165,7 @@ export class Flow {
 
     // Move to next argument group.
     const iNextArgumentGroup = iArgumentGroup - 1
-    const nextSpeech = this.getSpeech(iNextArgumentGroup, iSpeech)
+    const nextSpeech = this.getOrCreateSpeech(iNextArgumentGroup, iSpeech)
     const iNextArgument = nextSpeech.length > 0 ? nextSpeech.length - 1 : 0
     this.moveCursor(iArgumentGroup - 1, iSpeech, iNextArgument);
   }
