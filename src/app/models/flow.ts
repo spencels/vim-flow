@@ -183,7 +183,7 @@ export class Flow {
     // Adjust iArgument if new speech is smaller than the cursor. Set to 0 if
     // no arguments are present.
     const newSpeech = this.getSpeech(iArgumentGroup, iSpeech + 1)
-    const iNewArgument = newSpeech
+    const iNewArgument = newSpeech && newSpeech.length > 0
       ? (iArgument < newSpeech.length ? iArgument : newSpeech.length - 1)
       : 0
     this.moveCursor(iArgumentGroup, iSpeech + 1, iNewArgument)

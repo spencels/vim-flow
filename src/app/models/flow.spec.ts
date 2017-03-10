@@ -217,10 +217,38 @@ describe('Flow', () => {
   })
 
 
-  it('selectLeft/Right from empty argument group should not crash', () => {
+  it('selectLeft/Right from empty argument group', () => {
     flow.setArgumentGroups([group()])
     flow.selectRight()
     flow.selectLeft()
     expect(flow.cursor).toEqual(new Cursor(0, 0, 0))
+  })
+
+  it('selectLeft/Right into empty speech', () => {
+    flow.setArgumentGroups([
+      group(speech(), speech()),
+      group(speech(), speech(arg1))  // Argument to prevent speech GC
+    ])
+
+    flow.moveCursor(0, 0, 0)
+    flow.selectRight()
+    expect(flow.cursor).toEqual(new Cursor(0, 1, 0))
+
+    flow.moveCursor(0, 1, 0)
+    flow.selectLeft()
+    expect(flow.cursor).toEqual(new Cursor(0, 0, 0))
+  })
+
+  it('selectRight should select one past last argument', () => {
+    flow.setArgumentGroups([
+      group(speech(arg1))
+    ])
+
+    flow.selectArgument(arg1)
+    flow.selectRight()
+    expect(flow.cursor).toEqual(new Cursor(0, 1, 0))
+
+    flow.selectRight()
+    expect(flow.cursor).toEqual(new Cursor(0, 1, 0))
   })
 })

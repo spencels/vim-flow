@@ -12,6 +12,7 @@ export function enableProdMode() {
 
 let debugging = false
 export function enableDebugging() {
+  console.log('checkedArray debugger enabled')
   debugging = true
 }
 
