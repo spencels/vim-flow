@@ -213,6 +213,11 @@ export class Flow {
     const speech = this.getOrCreateSpeech(iNewArgumentGroup, iNewSpeech)
     speech.push(argument)
     this.selectArgument(argument)
+
+    // Update speeches count if this is a new speech.
+    if (this.cursor.iSpeech + 1 >= this.speechesCount) {
+      this.speechesCount = this.calculateSpeechesCount()
+    }
   }
 
   // Rearrange argument within a speech. Positive "direction" is down, negative
@@ -316,11 +321,6 @@ export class Flow {
     const argumentGroup = this.argumentGroups[iArgumentGroup]
     for (let i = argumentGroup.length; i <= iSpeech; i++) {
       argumentGroup.push([])
-    }
-
-    // Update speeches count if this is a new speech.
-    if (iSpeech >= this.speechesCount - 1) {
-      this.speechesCount = this.calculateSpeechesCount()
     }
     return argumentGroup[iSpeech]
   }

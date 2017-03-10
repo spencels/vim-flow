@@ -93,4 +93,11 @@ describe('Flow', () => {
 
   // moveCursor
 
+  // moveRight
+  it('moveArgument recalculates speech count', () => {
+    flow.createArgument(arg1, false)
+    flow.moveArgument(1, 0)
+    flow.moveArgument(1, 0)
+    expect(flow.speechesCount).toEqual(3)
+  })
 })
