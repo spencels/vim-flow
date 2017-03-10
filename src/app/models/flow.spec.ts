@@ -100,4 +100,30 @@ describe('Flow', () => {
     flow.moveArgument(1, 0)
     expect(flow.speechesCount).toEqual(3)
   })
+
+  // select*
+
+  it('selectUp/Down from empty argument group should not crash', () => {
+    flow.setArgumentGroups([
+      groupWithArgs(arg1),
+      group(),
+      groupWithArgs(arg2)
+    ])
+    flow.moveCursor(1, 0, 0)
+    flow.selectDown()
+    expect(flow.cursor).toEqual(new Cursor(2, 0, 0))
+    expect(flow.selectedArgument).toBe(arg2)
+
+    flow.moveCursor(1, 0, 0)
+    flow.selectUp()
+    expect(flow.cursor).toEqual(new Cursor(0, 0, 0))
+    expect(flow.selectedArgument).toBe(arg1)
+  })
+
+  it('selectLeft/Right from empty argument group should not crash', () => {
+    flow.setArgumentGroups([group()])
+    flow.selectRight()
+    flow.selectLeft()
+    expect(flow.cursor).toEqual(new Cursor(0, 0, 0))
+  })
 })

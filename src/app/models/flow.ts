@@ -132,9 +132,9 @@ export class Flow {
     if (this.trySetDefaultCursor()) return;
 
     const { iArgumentGroup, iSpeech, iArgument } = this.cursor
-    if (this.argumentGroups[iArgumentGroup][iSpeech]) {
-      const speechLength = this.argumentGroups[iArgumentGroup][iSpeech].length
-      if (iArgument + 1 < speechLength) {
+    const speech = this.getSpeech(iArgumentGroup, iSpeech)
+    if (speech) {
+      if (iArgument + 1 < speech.length) {
         this.moveCursor(iArgumentGroup, iSpeech, iArgument + 1)
         return;
       }
