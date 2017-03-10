@@ -238,14 +238,34 @@ export class Flow {
 
     this.argumentGroups[iArgumentGroup][iSpeech].splice(iArgument, 1);
 
-    this.selectArgument(null)
-    this.deleteArgumentGroupIfEmpty(iArgumentGroup)
-
     // If argument was the last argument in the last speech, recalculate speeches
     // Update speeches count if modifying the last speech.
     if (iSpeech + 1 == this.speechesCount) {
       this.updateSpeechCount()
     }
+
+    // Replace cursor
+    let speech = this.getSpeech(iArgumentGroup, iSpeech)
+    let iNewSpeech, iNewArgument
+    if (speech) {
+      // Select argument below the deleted, unless it doesn't exist.
+      iNewSpeech = iSpeech
+      if (speech.length == 0) {
+        iArgument = 0
+      } else if (speech.length == iArgument) {
+        // If the last in the last was deleted, select new end of list.
+        iNewArgument = speech.length - 1
+      } else {
+        // Else select the argument below.
+        iNewArgument = iArgument
+      }
+    } else {
+      // Select last speech + 1
+      iNewArgument = 0
+      iNewSpeech = this.argumentGroups[iArgumentGroup].length
+    }
+
+    this.moveCursor(iArgumentGroup, iNewSpeech, iNewArgument)
   }
 
   // Replaces existing argument at cursor with the provided one.

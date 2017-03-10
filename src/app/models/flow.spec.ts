@@ -119,6 +119,60 @@ describe('Flow', () => {
     expect(flow.speechesCount).toEqual(2)
   })
 
+  it('deleteArgumentAtCursor does not delete empty cell', () => {
+    flow.setArgumentGroups([
+      group(speech(arg1), speech(arg2))
+    ])
+
+    flow.selectArgument(arg1)
+    flow.deleteArgumentAtCursor()
+    flow.deleteArgumentAtCursor()
+    expect(flow.cursor).toEqual(new Cursor(0, 0, 0))
+    expect(flow.argumentGroups[0].length).toEqual(2)
+    expect(flow.argumentGroups[0][1].length).toEqual(1)
+    expect(flow.argumentGroups[0][1][0]).toBe(arg2)
+  })
+
+  it('deleteArgumentAtCursor leaves cursor in empty speech', () => {
+    flow.setArgumentGroups([
+      group(speech(arg1), speech(arg2))  // Extra arg to prevent speech GC
+    ])
+
+    flow.selectArgument(arg1)
+    flow.deleteArgumentAtCursor()
+    expect(flow.cursor).toEqual(new Cursor(0, 0, 0))
+  })
+
+  it('deleteArgumentAtCursor leaves cursor on argument below deleted', () => {
+    flow.setArgumentGroups([
+      group(speech(arg1, arg2, arg3))
+    ])
+
+    flow.selectArgument(arg2)
+    flow.deleteArgumentAtCursor()
+    expect(flow.cursor).toEqual(new Cursor(0, 0, 1))
+  })
+
+  it('deleteArgumentAtCursor leaves cursor on last argument', () => {
+    flow.setArgumentGroups([
+      group(speech(arg1, arg2, arg3))
+    ])
+
+    flow.selectArgument(arg3)
+    flow.deleteArgumentAtCursor()
+    expect(flow.cursor).toEqual(new Cursor(0, 0, 1))
+  })
+
+  it('deleteArgumentAtCursor selects last speech if it causes speech GC', () => {
+    flow.setArgumentGroups([
+      group(speech(arg1), speech(), speech(arg2))
+    ])
+
+    flow.selectArgument(arg2)
+    flow.deleteArgumentAtCursor()
+    expect(flow.cursor).toEqual(new Cursor(0, 1, 0))
+  })
+
   // moveCursor
 
   it('moveCursor throws error for invalid argument', () => {
@@ -216,6 +270,20 @@ describe('Flow', () => {
     expect(flow.selectedArgument).toBeNull()
   })
 
+  it('selectUp/Down should not select past boundaries', () => {
+    flow.setArgumentGroups([
+      group(speech(arg1))
+    ])
+
+    flow.selectArgument(arg1)
+    flow.selectDown()
+    expect(flow.cursor).toEqual(new Cursor(0, 0, 0))
+
+    flow.selectArgument(arg1)
+    flow.selectUp()
+    expect(flow.cursor).toEqual(new Cursor(0, 0, 0))
+  })
+
 
   it('selectLeft/Right from empty argument group', () => {
     flow.setArgumentGroups([group()])
@@ -250,5 +318,15 @@ describe('Flow', () => {
 
     flow.selectRight()
     expect(flow.cursor).toEqual(new Cursor(0, 1, 0))
+  })
+
+  it('selectLeft should not select past boundary', () => {
+    flow.setArgumentGroups([
+      groupWithArgs(arg1)
+    ])
+
+    flow.selectArgument(arg1)
+    flow.selectLeft()
+    expect(flow.cursor).toEqual(new Cursor(0, 0, 0))
   })
 })
