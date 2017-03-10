@@ -1,4 +1,5 @@
 // Flow data structures and operations.
+import { createCheckedArray } from 'app/util/checkedArray'
 
 export interface Argument {
   contents: string
@@ -20,7 +21,7 @@ export class Cursor {
 
 export class Flow {
   // Outer list is speeches, inner list is arguments.
-  argumentGroups: ArgumentGroup[] = [[]];
+  argumentGroups: ArgumentGroup[] = createCheckedArray([[]])
 
   // Coordinates of selected argument.
   cursor: Cursor = new Cursor(0, 0, 0)
@@ -30,8 +31,11 @@ export class Flow {
 
   // Number of speeches. This is used to determine how far right the cursor can
   // move.
-  speechesCount: number = 2
+  speechesCount: number = 0
 
+  // Non-mutating methods
+
+  // Returns cursor for argument, or null if it is not in the flow.
   findArgument(argument: Argument) {
     for (var iGroup = 0; iGroup < this.argumentGroups.length; iGroup++) {
       let argumentGroup = this.argumentGroups[iGroup];
@@ -48,6 +52,45 @@ export class Flow {
       }
     }
     return null
+  }
+
+  // Count max number of speeches with arguments in an argument group.
+  countSpeeches() {
+    return this.argumentGroups.map(x => x.length)
+      .reduce((acc, val) => Math.max(acc, val));
+  }
+
+  // Gets argument at coordinates, or null if it doesn't exist.
+  getArgument(iArgumentGroup: number, iSpeech: number, iArgument: number) {
+    if (iArgumentGroup >= this.argumentGroups.length
+        || iSpeech >= this.argumentGroups[iArgumentGroup].length
+        || iArgument >= this.argumentGroups[iArgumentGroup][iSpeech].length) {
+      return null
+    }
+    const speech = this.argumentGroups[iArgumentGroup][iSpeech]
+    return speech[iArgument]
+  }
+
+  // Gets speech at coordinates, or null if it doesn't exist.
+  getSpeech(iArgumentGroup: number, iSpeech: number) {
+    if (iArgumentGroup >= this.argumentGroups.length
+        || iSpeech >= this.argumentGroups[iArgumentGroup].length) {
+      return null
+    }
+    return this.argumentGroups[iArgumentGroup][iSpeech]
+  }
+
+  getSpeechAtCursor() {
+    return this.getSpeech(this.cursor.iArgumentGroup, this.cursor.iSpeech)
+  }
+
+  // Mutation methods
+
+  // TEST ONLY - Replaces argument groups
+  setArgumentGroups(argumentGroups: ArgumentGroup[]) {
+    this.argumentGroups = createCheckedArray(argumentGroups)
+    this.moveCursor(0, 0, 0)
+    this.speechesCount = this.countSpeeches()
   }
 
   // Sets cursor to new argument.
@@ -78,40 +121,9 @@ export class Flow {
     }
   }
 
+  // Moves cursor to speech at given coordinates.
   selectSpeech(iArgumentGroup, iSpeech) {
     this.moveCursor(iArgumentGroup, iSpeech, 0)
-  }
-
-  // Gets argument at coordinates, or null if it doesn't exist.
-  getArgument(iArgumentGroup: number, iSpeech: number, iArgument: number) {
-    if (iArgumentGroup >= this.argumentGroups.length
-        || iSpeech >= this.argumentGroups[iArgumentGroup].length
-        || iArgument >= this.argumentGroups[iArgumentGroup][iSpeech].length) {
-      return null
-    }
-    const speech = this.argumentGroups[iArgumentGroup][iSpeech]
-    return speech[iArgument]
-  }
-
-  // Gets speech at coordinates, or null if it doesn't exist.
-  getSpeech(iArgumentGroup: number, iSpeech: number) {
-    if (iArgumentGroup >= this.argumentGroups.length
-        || iSpeech >= this.argumentGroups[iArgumentGroup].length) {
-      return null
-    }
-    return this.argumentGroups[iArgumentGroup][iSpeech]
-  }
-
-  getSpeechAtCursor() {
-    return this.getSpeech(this.cursor.iArgumentGroup, this.cursor.iSpeech)
-  }
-  // Places cursor in the default location, if cursor is not already set.
-  // Returns true if cursor was set, or if cursor cannot be set.
-  trySetDefaultCursor() {
-    if (this.cursor !== Cursor.EMPTY) return false;
-
-    this.moveCursor(0, 0, 0)
-    return this.cursor !== Cursor.EMPTY
   }
 
   // Moves cursor down to next argument.
@@ -225,38 +237,10 @@ export class Flow {
     this.speechesCount = this.countSpeeches()
   }
 
-  private deleteArgumentGroupIfEmpty(iArgumentGroup: number) {
-    // Don't delete the last group.
-    if (this.argumentGroups.length <= 1) return;
-
-    const argumentGroupIsEmpty = this.argumentGroups[iArgumentGroup]
-      .every(speech => speech.length == 0)
-    if (argumentGroupIsEmpty) {
-      this.argumentGroups.splice(iArgumentGroup, 1)
-    }
-
-    // Move cursor.
-    this.selectArgument(null)
-  }
-
-  countSpeeches() {
-    return this.argumentGroups.map(x => x.length)
-      .reduce((acc, val) => Math.max(acc, val));
-  }
-
-  // Returns the maximum number of speeches held by an argument group. Does not
-  // count speeches without arguments.
-  private calculateSpeechesCount() {
-    return this.argumentGroups.reduce(
-      (accumulator, argumentGroup) => {
-        // Find group length, ignoring speeches that are empty.
-        let speechCount = argumentGroup.length
-        while (speechCount > 0 && argumentGroup[speechCount - 1].length == 0) {
-          speechCount -= 1
-        }
-        return Math.max(accumulator, speechCount)
-      },
-      0)
+  // Replaces existing argument at cursor with the provided one.
+  putArgument(argument: Argument) {
+    this.getSpeechAtCursor()[this.cursor.iArgument] = argument
+    this.selectArgument(argument)
   }
 
   // Places a new argument at cursor and moves cursor to it. If `newGroup` is
@@ -289,6 +273,37 @@ export class Flow {
     return this.selectArgument(argument)  // TODO: Use moveCursor for performance
   }
 
+  // Private methods
+
+  private deleteArgumentGroupIfEmpty(iArgumentGroup: number) {
+    // Don't delete the last group.
+    if (this.argumentGroups.length <= 1) return;
+
+    const argumentGroupIsEmpty = this.argumentGroups[iArgumentGroup]
+      .every(speech => speech.length == 0)
+    if (argumentGroupIsEmpty) {
+      this.argumentGroups.splice(iArgumentGroup, 1)
+    }
+
+    // Move cursor.
+    this.selectArgument(null)
+  }
+
+  // Returns the maximum number of speeches held by an argument group. Does not
+  // count speeches without arguments.
+  private calculateSpeechesCount() {
+    return this.argumentGroups.reduce(
+      (accumulator, argumentGroup) => {
+        // Find group length, ignoring speeches that are empty.
+        let speechCount = argumentGroup.length
+        while (speechCount > 0 && argumentGroup[speechCount - 1].length == 0) {
+          speechCount -= 1
+        }
+        return Math.max(accumulator, speechCount)
+      },
+      0)
+  }
+
   private getOrCreateArgumentGroup(iArgumentGroup) {
     for (let i = this.argumentGroups.length; i < iArgumentGroup + 1; i++) {
       this.argumentGroups.push([])
@@ -310,9 +325,12 @@ export class Flow {
     return argumentGroup[iSpeech]
   }
 
-  // Replaces existing argument at cursor with the provided one.
-  putArgument(argument: Argument) {
-    this.getSpeechAtCursor()[this.cursor.iArgument] = argument
-    this.selectArgument(argument)
+  // Places cursor in the default location, if cursor is not already set.
+  // Returns true if cursor was set, or if cursor cannot be set.
+  private trySetDefaultCursor() {
+    if (this.cursor !== Cursor.EMPTY) return false;
+
+    this.moveCursor(0, 0, 0)
+    return this.cursor !== Cursor.EMPTY
   }
 }

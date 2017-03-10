@@ -120,7 +120,6 @@ export class AppComponent extends OnInit {
   }
 
   editText(text) {
-    console.log(`editText(${text}`)
     this.editModel.text = text
   }
 }
