@@ -10,6 +10,11 @@ export function enableProdMode() {
   prodMode = true
 }
 
+let debugging = false
+export function enableDebugging() {
+  debugging = true
+}
+
 // Javascript array with bounds checking. Use `_checkedArray` property to get
 // the proxied Array.
 export function createCheckedArray(
@@ -23,11 +28,12 @@ export function createCheckedArray(
       target[i] = createCheckedArray(target[i])
     }
   }
- 
+  
   return new Proxy(target, {
     get: function(target: Array<any>, name) {
       if (isNumeric(name)) {
         if (name >= target.length || name < 0) {
+          if (debugging) debugger
         	throw new Error('Array out of bounds')
         }
       } else if (name == '_checkedArray') {

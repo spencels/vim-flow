@@ -9,6 +9,8 @@ import * as checkedArray from 'app/util/checkedArray'
 if (environment.production) {
   enableProdMode();
   checkedArray.enableProdMode()
+} else {
+  checkedArray.enableDebugging()
 }
 
 platformBrowserDynamic().bootstrapModule(AppModule);

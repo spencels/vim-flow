@@ -3,7 +3,7 @@ import { createCheckedArray } from 'app/util/checkedArray'
 describe("checkedArray", function() {
     
   it("equals empty array", () => {
-    let a = createCheckedArray()
+    let a = createCheckedArray([])
     expect(a).toEqual([])
   })
   
@@ -24,7 +24,7 @@ describe("checkedArray", function() {
   })
   
   it('throws on negative index', () => {
-  	let a= createCheckedArray([1])
+  	let a = createCheckedArray([1])
     expect(() => a[-1]).toThrow()
   })
   
@@ -34,7 +34,7 @@ describe("checkedArray", function() {
   })
 
   it('pushed child arrays are also checked', () => {
-    let a = createCheckedArray()
+    let a = createCheckedArray([])
     a.push([])
     expect(() => a[0][0]).toThrow()
   })
