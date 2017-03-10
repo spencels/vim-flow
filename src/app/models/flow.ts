@@ -62,6 +62,14 @@ export class Flow {
 
   // Gets argument at coordinates, or null if it doesn't exist.
   getArgument(iArgumentGroup: number, iSpeech: number, iArgument: number) {
+    if (iArgumentGroup < 0) {
+      throw new Error(`iArgumentGroup negative (${iArgumentGroup}`)
+    } else if (iSpeech < 0) {
+      throw new Error(`iSpeech negative (${iSpeech}`)
+    } else if (iArgument < 0) {
+      throw new Error(`iArgument negative (${iArgument}`)
+    }
+
     if (iArgumentGroup >= this.argumentGroups.length
         || iSpeech >= this.argumentGroups[iArgumentGroup].length
         || iArgument >= this.argumentGroups[iArgumentGroup][iSpeech].length) {
@@ -164,7 +172,7 @@ export class Flow {
     // Move to next argument group.
     const iNextArgumentGroup = iArgumentGroup - 1
     const nextSpeech = this.getSpeech(iNextArgumentGroup, iSpeech)
-    const iNextArgument = nextSpeech ? nextSpeech.length - 1 : 0
+    const iNextArgument = nextSpeech.length > 0 ? nextSpeech.length - 1 : 0
     this.moveCursor(iArgumentGroup - 1, iSpeech, iNextArgument);
   }
 

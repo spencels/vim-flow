@@ -48,6 +48,9 @@ import { EditModel } from 'app/models/edit'
       margin: 1em;
       padding: 0.7em;
       border-bottom: 0.25em solid;
+      border-left: 0.1em dotted;
+      border-right: 0.1em dotted;
+      min-width: 6em
     }
 
     .empty-selected {

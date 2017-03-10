@@ -93,7 +93,14 @@ describe('Flow', () => {
 
   // moveCursor
 
-  // moveRight
+  it('moveCursor throws error for invalid argument', () => {
+    expect(() => flow.moveCursor(-1, 0, 0)).toThrow()
+    expect(() => flow.moveCursor(0, -1, 0)).toThrow()
+    expect(() => flow.moveCursor(0, 0, -1)).toThrow()
+  })
+
+  // moveArgument
+
   it('moveArgument recalculates speech count', () => {
     flow.createArgument(arg1, false)
     flow.moveArgument(1, 0)
@@ -103,7 +110,7 @@ describe('Flow', () => {
 
   // select*
 
-  it('selectUp/Down from empty argument group should not crash', () => {
+  it('selectUp/Down from empty argument group', () => {
     flow.setArgumentGroups([
       groupWithArgs(arg1),
       group(),
@@ -118,6 +125,23 @@ describe('Flow', () => {
     flow.selectUp()
     expect(flow.cursor).toEqual(new Cursor(0, 0, 0))
     expect(flow.selectedArgument).toBe(arg1)
+  })
+
+  it('selectUp/Down from empty speech into empty speech', () => {
+    flow.setArgumentGroups([
+      group(speech()),
+      group(speech()),
+    ])
+
+    flow.moveCursor(0, 0, 0)
+    flow.selectDown()
+    expect(flow.cursor).toEqual(new Cursor(1, 0, 0))
+    expect(flow.selectedArgument).toBeNull()
+
+    flow.moveCursor(1, 0, 0)
+    flow.selectUp()
+    expect(flow.cursor).toEqual(new Cursor(0, 0, 0))
+    expect(flow.selectedArgument).toBeNull()
   })
 
   it('selectLeft/Right from empty argument group should not crash', () => {
