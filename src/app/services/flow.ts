@@ -1,3 +1,4 @@
+import { Injectable } from '@angular/core'
 // Flow data structures and operations.
 import { createCheckedArray } from 'app/util/checkedArray'
 
@@ -19,7 +20,8 @@ export class Cursor {
   public static readonly EMPTY = new Cursor(-1, 0, 0)
 }
 
-export class Flow {
+@Injectable()
+export class FlowService {
   // Outer list is speeches, inner list is arguments.
   argumentGroups: ArgumentGroup[] = createCheckedArray([[]])
 

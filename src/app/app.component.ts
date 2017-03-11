@@ -1,7 +1,7 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component } from '@angular/core';
 
-import { Flow, Argument } from 'app/models/flow'
-import { EditModel } from 'app/models/edit'
+import { FlowService, Argument } from 'app/services/flow'
+import { EditService } from 'app/services/edit'
 
 type KeyMap = { [key: string]: () => void }
 
@@ -25,18 +25,13 @@ enum Mode {
     </app-flow>
   `,
 })
-export class AppComponent extends OnInit {
+export class AppComponent {
   // Models
-  flow = new Flow();
-  editModel = new EditModel()
   commandKeyMap: KeyMap = {}
   editKeyMap: KeyMap = {}
   mode: Mode = Mode.Command
 
-  // TODO: Delete after implementing argument editing.
-  argumentCounter = 0
-
-  ngOnInit() {
+  constructor(private flow: FlowService, private editModel: EditService) {
     // Map keyboard shortcuts
     let moveArgument = (x, y) => this.flow.moveArgument(x, y)
 
@@ -84,7 +79,6 @@ export class AppComponent extends OnInit {
     this.flow.selectSpeech(iArgumentGroup, iSpeech)
   }
 
-  // @HostListener('keypress', ['$event'])
   keyPress(event: KeyboardEvent) {
     switch (this.mode) {
       case Mode.Command: {

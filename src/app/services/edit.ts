@@ -1,7 +1,7 @@
 // View-model for editing arguments.
-import { Cursor, Argument } from 'app/models/flow'
+import { Cursor, Argument } from 'app/services/flow'
 
-export class EditModel {
+export class EditService {
   // Editing coordinates
   iArgumentGroup = -1
   iSpeech = -1

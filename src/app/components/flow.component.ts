@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core'
 
-import { Flow, Argument } from 'app/models/flow'
-import { EditModel } from 'app/models/edit'
+import { FlowService, Argument } from 'app/services/flow'
+import { EditService } from 'app/services/edit'
 
 @Component({
   selector: 'app-flow',
@@ -62,8 +62,8 @@ import { EditModel } from 'app/models/edit'
   `]
 })
 export class FlowComponent {
-  @Input() flow: Flow
-  @Input() editModel: EditModel
+  @Input() flow: FlowService
+  @Input() editModel: EditService
   @Output() selectArgument = new EventEmitter()
   @Output() selectSpeech = new EventEmitter()
   @Output() editText = new EventEmitter()

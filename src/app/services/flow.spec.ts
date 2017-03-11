@@ -1,4 +1,6 @@
-import { Flow, Cursor, ArgumentGroup, Speech, Argument } from 'app/models/flow'
+import {
+  FlowService, Cursor, ArgumentGroup, Speech, Argument
+} from 'app/services/flow'
 
 // Utility functions
 
@@ -26,9 +28,9 @@ const arg3 = arg('arg3')
 
 // Tests accessors
 describe('Flow', () => {
-  let flow: Flow
+  let flow: FlowService
   beforeEach(() => {
-    flow = new Flow()
+    flow = new FlowService()
   })
 
   // findArgument
