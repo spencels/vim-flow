@@ -1,3 +1,5 @@
+import { } from '@angular/core/testing'
+
 import {
   FlowService, Cursor, ArgumentGroup, Speech, Argument
 } from 'app/services/flow'
@@ -219,6 +221,53 @@ describe('Flow', () => {
     expect(flow.argumentGroups[0].length).toEqual(2)
   })
 
+  it('moveArgument moving second argument shouldn\'t erase other arguments', () => {
+    flow.setArgumentGroups([
+      group(speech(arg1, arg2))
+    ])
+
+    flow.selectArgument(arg2)
+    flow.moveArgument(0, 1)
+    expect(flow.argumentGroups).toEqual([
+      groupWithArgs(arg1),
+      groupWithArgs(arg2)
+    ])
+  })
+
+  // moveArgumentInSpeech
+
+  it('moveArgumentInSpeech moves argument within a speech', () => {
+    flow.setArgumentGroups([
+      groupWithArgs(arg1, arg2, arg3)
+    ])
+
+    flow.selectArgument(arg1)
+    flow.moveArgumentInSpeech(1)
+    expect(flow.getSpeech(0, 0)).toEqual(speech(arg2, arg1, arg3))
+    expect(flow.cursor).toEqual(new Cursor(0, 0, 1))
+
+    flow.selectArgument(arg3)
+    flow.moveArgumentInSpeech(-1)
+    expect(flow.getSpeech(0, 0)).toEqual(speech(arg2, arg3, arg1))
+    expect(flow.cursor).toEqual(new Cursor(0, 0, 1))
+  })
+
+  it('moveArgumentInSpeech into border doesn\'t change anything', () => {
+    flow.setArgumentGroups([
+      groupWithArgs(arg1, arg2, arg3)
+    ])
+
+    flow.selectArgument(arg1)
+    flow.moveArgumentInSpeech(-1)
+    expect(flow.getSpeech(0, 0)).toEqual(speech(arg1, arg2, arg3))
+    expect(flow.cursor).toEqual(new Cursor(0, 0, 0))
+
+    flow.selectArgument(arg3)
+    flow.moveArgumentInSpeech(1)
+    expect(flow.getSpeech(0, 0)).toEqual(speech(arg1, arg2, arg3))
+    expect(flow.cursor).toEqual(new Cursor(0, 0, 2))
+  })
+
   // select*
 
   it('selectUp/Down from empty argument group', () => {
@@ -329,6 +378,22 @@ describe('Flow', () => {
 
     flow.selectArgument(arg1)
     flow.selectLeft()
+    expect(flow.cursor).toEqual(new Cursor(0, 0, 0))
+  })
+
+  it('selectTop/Bottom should move cursor', () => {
+    flow.setArgumentGroups([
+      group(),
+      group(),
+      group()
+    ])
+
+    flow.moveCursor(0, 0, 0);
+    flow.selectBottom()
+    expect(flow.cursor).toEqual(new Cursor(2, 0, 0))
+
+    flow.moveCursor(2, 0, 0);
+    flow.selectTop()
     expect(flow.cursor).toEqual(new Cursor(0, 0, 0))
   })
 })

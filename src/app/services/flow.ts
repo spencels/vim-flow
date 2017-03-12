@@ -202,6 +202,19 @@ export class FlowService {
     this.moveCursor(iArgumentGroup, iSpeech - 1, iArgument)
   }
 
+  // Moves cursor to top of the speech.
+  selectTop() {
+    this.moveCursor(0, this.cursor.iSpeech, 0)
+  }
+
+  // Moves cursor to the bottom speech.
+  selectBottom() {
+    const iNewArgumentGroup = this.argumentGroups.length - 1
+    const newSpeech = this.getSpeech(iNewArgumentGroup, this.cursor.iSpeech)
+    const iNewArgument = newSpeech ? newSpeech.length - 1 : 0
+    this.moveCursor(iNewArgumentGroup, this.cursor.iSpeech, iNewArgument)
+  }
+
   // Move argument at cursor to new speech. 
   moveArgument(x: number, y: number) {
     const iNewArgumentGroup = this.cursor.iArgumentGroup + y
@@ -211,14 +224,14 @@ export class FlowService {
     if (iNewArgumentGroup < 0 || iNewSpeech < 0) return;
 
     const oldSpeech = this.getSpeechAtCursor()
-    const [argument] = oldSpeech.splice(this.cursor.iArgument)
+    const [argument] = oldSpeech.splice(this.cursor.iArgument, 1)
 
     const argumentGroup = this.getOrCreateArgumentGroup(iNewArgumentGroup)
     const speech = this.getOrCreateSpeech(iNewArgumentGroup, iNewSpeech)
     speech.push(argument)
     const iOldSpeech = this.cursor.iSpeech
     this.selectArgument(argument)
-
+ 
     // Update speeches count if modifying the last speech.
     if (iOldSpeech + 1 == this.speechesCount) {
       this.updateSpeechCount()
@@ -228,7 +241,18 @@ export class FlowService {
   // Rearrange argument within a speech. Positive "direction" is down, negative
   // is up.
   moveArgumentInSpeech(direction: number) {
-    // TODO
+    const iNewArgument = this.cursor.iArgument + direction
+    const speech = this.getSpeechAtCursor()
+    if (iNewArgument < 0 || iNewArgument >= speech.length) {
+      return
+    }
+
+    let tmp = speech[this.cursor.iArgument]
+    speech[this.cursor.iArgument] = speech[iNewArgument]
+    speech[iNewArgument] = tmp
+
+    this.moveCursor(
+      this.cursor.iArgumentGroup, this.cursor.iSpeech, iNewArgument)
   }
 
   // Finds (argumentGroup, speech, argument) index tuple for the given argument.
