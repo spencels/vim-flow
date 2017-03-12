@@ -8,7 +8,8 @@ import { EditService } from 'app/services/edit'
   template: `
     <div class="flow-container">
       <div class="argumentGroup"
-           *ngFor="let argumentGroup of flow.argumentGroups; let iArgumentGroup = index">
+           *ngFor="let argumentGroup of flow.argumentGroups;
+                   let iArgumentGroup = index">
         <div class="speech"
              (click)="selectSpeech.emit([iArgumentGroup, iSpeech])"
              *ngFor="let iSpeech of getSpeechesRange()">
@@ -17,7 +18,8 @@ import { EditService } from 'app/services/edit'
           </div>
           <template [ngIf]="iSpeech < argumentGroup.length">
             <app-argument
-                *ngFor="let argument of argumentGroup[iSpeech]; let iArgument = index"
+                *ngFor="let argument of argumentGroup[iSpeech];
+                        let iArgument = index"
                 [argument]="argument"
                 [selected]="isArgumentSelected(argument)"
                 [editing]="isEditing(iArgumentGroup, iSpeech, iArgument)"

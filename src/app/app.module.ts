@@ -11,6 +11,7 @@ import { FocusDirective } from 'app/directives/focus'
 
 import { FlowService } from 'app/services/flow'
 import { EditService } from 'app/services/edit'
+import { InputService } from 'app/services/input'
 
 @NgModule({
   declarations: [
@@ -25,7 +26,7 @@ import { EditService } from 'app/services/edit'
     HttpModule,
     MaterialModule
   ],
-  providers: [FlowService, EditService],
+  providers: [FlowService, EditService, InputService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
