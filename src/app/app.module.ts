@@ -7,18 +7,21 @@ import { MaterialModule } from '@angular/material'
 import { AppComponent } from 'app/app.component';
 import { FlowComponent } from 'app/components/flow.component';
 import { ArgumentComponent } from 'app/components/argument.component'
+import { InputsPanelComponent } from 'app/components/inputsPanel.component'
+
 import { FocusDirective } from 'app/directives/focus'
 
 import { FlowService } from 'app/services/flow'
 import { EditService } from 'app/services/edit'
-import { InputService } from 'app/services/input'
+import { InputService } from 'app/services/input';
 
 @NgModule({
   declarations: [
     AppComponent,
     FlowComponent,
     ArgumentComponent,
-    FocusDirective
+    FocusDirective,
+    InputsPanelComponent
   ],
   imports: [
     BrowserModule,

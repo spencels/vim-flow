@@ -40,6 +40,7 @@ import { EditService } from 'app/services/edit'
 
     .flow-container {
       display: table;
+      background-color: white;
     }
 
     .argumentGroup {

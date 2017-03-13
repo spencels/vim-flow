@@ -4,7 +4,7 @@ import { Mode } from 'app/models/mode'
 
 // Application mode.
 export class KeyCommand {
-  // HTML key name
+  // HTML key name.
   key: string
 
   // Windows key or Command key.
@@ -31,7 +31,13 @@ export class KeyCommand {
 }
 
 export interface KeyMapping {
+  // Action name.
+  name: string
+
+  // Keyboard shortcut.
   command: KeyCommand
+
+  // Callback
   action: () => void
 }
 
@@ -39,13 +45,13 @@ export type KeyMap = KeyMapping[];
 
 @Injectable()
 export class InputService {
-  keyMaps = new Map<Mode, KeyMap>([
+  public keyMaps = new Map<Mode, KeyMap>([
     [Mode.command, []],
     [Mode.edit, []]
   ])
 
   // Maps keyboard shortcut.
-  mapShortcut(mode: Mode, shortcut: string, action: () => void) {
+  mapShortcut(mode: Mode, name: string, shortcut: string, action: () => void) {
     // Parse shortcut
     let keyCommand = new KeyCommand()
     for (let button of shortcut.split('-')) {
@@ -75,8 +81,9 @@ export class InputService {
       return
     }
     keyMap.push({
-      command: keyCommand,
-      action: action
+      name,
+      action,
+      command: keyCommand
     })
   }
 

@@ -8,15 +8,55 @@ import { Mode } from 'app/models/mode'
 @Component({
   selector: 'app-root',
   template: `
-    <app-flow 
-      [flow]="flow"
-      [editModel]="editModel"
-      (selectArgument)="flow.selectArgument($event)"
-      (selectSpeech)="selectSpeech($event)"
-      (editText)="editText($event)"
-      (window:keypress)="keyPress($event)">
-    </app-flow>
+    <div id="appContainer">
+      <app-inputs-panel id="inputsPanel" [activeMode]="mode"></app-inputs-panel>
+      <div id="appFlowContainer">
+        <app-flow 
+          id="appFlow"
+          [flow]="flow"
+          [editModel]="editModel"
+          (selectArgument)="flow.selectArgument($event)"
+          (selectSpeech)="selectSpeech($event)"
+          (editText)="editText($event)"
+          (window:keypress)="keyPress($event)">
+        </app-flow>
+      </div>
+    </div>
   `,
+
+  styles: [`
+    #appContainer {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      padding: 0px;
+
+      box-sizing: border-box;
+      top: 0;
+      left: 0;
+    }
+
+    #appFlowContainer {
+      width: auto;
+      height: 100%;
+      background-color: #DDDDDD;
+
+      box-sizing: border-box;
+      padding: 5px;
+
+      /* Triggers block formatting context, which allows shortcut panel to be
+         fixed to the right. */
+      overflow: scroll;
+    }
+
+    #inputsPanel {
+      width: 300px;
+      height: 100%;
+      float: right;
+
+      background-color: white;
+    }
+  `]
 })
 export class AppComponent {
   // Models
@@ -26,33 +66,38 @@ export class AppComponent {
       private flow: FlowService, private editModel: EditService,
       private input: InputService) {
     // Map keyboard shortcuts
-    let moveArgument = (x, y) => this.flow.moveArgument(x, y)
-    let moveArgumentInSpeech = x => this.flow.moveArgumentInSpeech(x)
+    const commandKeyMap: [string, string, () => void][] = [
+      ['Move cursor down', 'j', () => this.flow.selectDown()],
+      ['Move cursor up', 'k', () => this.flow.selectUp()],
+      ['Move cursor right', 'l', () => this.flow.selectRight()],
+      ['Move cursor left', 'h', () => this.flow.selectLeft()],
+      ['Move argument to group - down', 'J', () => this.flow.moveArgument(0, 1)],
+      ['Move argument to group - up', 'K', () => this.flow.moveArgument(0, -1)],
+      ['Move argument to group - right', 'L', () => this.flow.moveArgument(1, 0)],
+      ['Move argument to group - left', 'H', () => this.flow.moveArgument(-1, 0)],
+      ['Move argument within group - down', 'ctrl-j',
+      () => this.flow.moveArgumentInSpeech(1)],
+      ['Move argument within group - up', 'ctrl-k',
+      () => this.flow.moveArgumentInSpeech(-1)],
+      ['Move cursor to top', 'g', () => this.flow.selectTop()],
+      ['Move cursor to bottom', 'G', () => this.flow.selectBottom()],
+      ['New argument', 'n', () => this.createArgument(false)],
+      ['New argument and create new group', 'N', () => this.createArgument(true)],
+      ['Delete argument', 'd', () => this.flow.deleteArgumentAtCursor()],
+      ['Edit argument', 'e', () => this.editArgument()],
+      ['Replace argument (overwrite)', 's', () => this.editArgument(true)]
+    ]
 
-    this.input.mapShortcut(Mode.command, 'j', () => this.flow.selectDown())
-    this.input.mapShortcut(Mode.command, 'k', () => this.flow.selectUp())
-    this.input.mapShortcut(Mode.command, 'l', () => this.flow.selectRight())
-    this.input.mapShortcut(Mode.command, 'h', () => this.flow.selectLeft())
-    this.input.mapShortcut(Mode.command, 'J', () => moveArgument(0, 1))
-    this.input.mapShortcut(Mode.command, 'K', () => moveArgument(0, -1))
-    this.input.mapShortcut(Mode.command, 'L', () => moveArgument(1, 0))
-    this.input.mapShortcut(Mode.command, 'H', () => moveArgument(-1, 0))
-    this.input.mapShortcut(
-      Mode.command, 'ctrl-j', () => moveArgumentInSpeech(1))
-    this.input.mapShortcut(
-      Mode.command, 'ctrl-k', () => moveArgumentInSpeech(-1))
-    this.input.mapShortcut(Mode.command, 'g', () => this.flow.selectTop())
-    this.input.mapShortcut(Mode.command, 'G', () => this.flow.selectBottom())
-    this.input.mapShortcut(Mode.command, 'n', () => this.createArgument(false))
-    this.input.mapShortcut(Mode.command, 'N', () => this.createArgument(true))
-    this.input.mapShortcut(
-      Mode.command, 'd', () => this.flow.deleteArgumentAtCursor())
-    this.input.mapShortcut(
-      Mode.command, 'e', () => this.editArgument())
-    this.input.mapShortcut(
-      Mode.command, 's', () => this.editArgument(true))
+    const editKeyMap: [string, string, () => void][] = [
+      ['Finish editing', 'Enter', () => this.stopEditing()]
+    ]
 
-    this.input.mapShortcut(Mode.edit, 'Enter', () => this.stopEditing())
+    for (let [name, shortcut, action] of commandKeyMap) {
+      this.input.mapShortcut(Mode.command, name, shortcut, action)
+    }
+    for (let [name, shortcut, action] of editKeyMap) {
+      this.input.mapShortcut(Mode.edit, name, shortcut, action)
+    }
   }
 
   keyPress(event) {
