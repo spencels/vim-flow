@@ -1,5 +1,5 @@
 // View-model for editing arguments.
-import { Cursor, Argument } from 'app/services/flow'
+import { Cursor, Argument } from 'app/models/flow'
 
 export class EditService {
   // Editing coordinates

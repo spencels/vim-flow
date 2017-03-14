@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 
-import { FlowService, Argument } from 'app/services/flow'
+import { FlowService } from 'app/services/flow'
 import { EditService } from 'app/services/edit'
 import { InputService } from 'app/services/input'
 import { Mode } from 'app/models/mode'
+import { Argument } from 'app/models/flow'
 
 @Component({
   selector: 'app-root',
