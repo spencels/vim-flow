@@ -1,8 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core'
 
-import { FlowService } from 'app/services/flow'
-import { Argument } from 'app/models/flow'
-import { EditService } from 'app/services/edit'
+import { FlowService } from 'app/flow.service'
+import { Argument } from 'app/flow.model'
+import { EditService } from 'app/edit.service'
 
 @Component({
   selector: 'app-flow',

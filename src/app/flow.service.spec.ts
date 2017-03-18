@@ -1,8 +1,7 @@
 import { } from '@angular/core/testing'
 
-import {
-  FlowService, Cursor, ArgumentGroup, Speech, Argument
-} from 'app/services/flow'
+import { FlowService } from 'app/flow.service'
+import { Cursor, ArgumentGroup, Speech, Argument } from 'app/flow.model'
 
 // Utility functions
 

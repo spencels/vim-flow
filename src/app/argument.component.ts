@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, Output, EventEmitter, SimpleChanges
          } from '@angular/core';
 
-import { Argument } from 'app/models/flow'
+import { Argument } from 'app/flow.model'
 
 @Component({
   selector: 'app-argument',

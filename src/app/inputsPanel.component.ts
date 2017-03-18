@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
 
-import { Mode } from 'app/models/mode'
-import { InputService } from 'app/services/input'
+import { Mode } from 'app/mode.model'
+import { InputService } from 'app/input.service'
 
 @Component({
   selector: 'app-inputs-panel',

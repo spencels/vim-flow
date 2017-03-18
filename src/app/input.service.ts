@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 
-import { Mode } from 'app/models/mode'
+import { Mode } from 'app/mode.model'
 
 // Application mode.
 export class KeyCommand {

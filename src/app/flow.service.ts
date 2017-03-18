@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 // Flow data structures and operations.
 import { createCheckedArray } from 'app/util/checkedArray'
-import { Argument, Speech, ArgumentGroup, Cursor } from 'app/models/flow'
+import { Argument, Speech, ArgumentGroup, Cursor } from 'app/flow.model'
 
 @Injectable()
 export class FlowService {
