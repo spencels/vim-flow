@@ -10,7 +10,9 @@ import { Argument } from 'app/flow.model'
   selector: 'app-root',
   template: `
     <div id="appContainer">
-      <app-inputs-panel id="inputsPanel" [activeMode]="mode"></app-inputs-panel>
+      <app-inputs-panel id="inputsPanel" [activeMode]="mode"
+          [ngClass]="{'hidden': !input.panelVisible}">
+      </app-inputs-panel>
       <div id="appFlowContainer">
         <app-flow 
           id="appFlow"
@@ -57,6 +59,10 @@ import { Argument } from 'app/flow.model'
 
       background-color: white;
     }
+
+    .hidden {
+      display: none;
+    }
   `]
 })
 export class AppComponent {
@@ -68,25 +74,33 @@ export class AppComponent {
       private input: InputService) {
     // Map keyboard shortcuts
     const commandKeyMap: [string, string, () => void][] = [
+      ['Delete argument', 'd', () => this.flow.deleteArgumentAtCursor()],
+      ['Edit argument', 'e', () => this.editArgument()],
+      ['Replace argument (overwrite)', 's', () => this.editArgument(true)],
       ['Move cursor down', 'j', () => this.flow.selectDown()],
       ['Move cursor up', 'k', () => this.flow.selectUp()],
       ['Move cursor right', 'l', () => this.flow.selectRight()],
       ['Move cursor left', 'h', () => this.flow.selectLeft()],
-      ['Move argument to group - down', 'J', () => this.flow.moveArgument(0, 1)],
-      ['Move argument to group - up', 'K', () => this.flow.moveArgument(0, -1)],
-      ['Move argument to group - right', 'L', () => this.flow.moveArgument(1, 0)],
-      ['Move argument to group - left', 'H', () => this.flow.moveArgument(-1, 0)],
-      ['Move argument within group - down', 'ctrl-j',
-      () => this.flow.moveArgumentInSpeech(1)],
-      ['Move argument within group - up', 'ctrl-k',
-      () => this.flow.moveArgumentInSpeech(-1)],
       ['Move cursor to top', 'g', () => this.flow.selectTop()],
       ['Move cursor to bottom', 'G', () => this.flow.selectBottom()],
+      ['Move cursor to next group', 'J', () => this.flow.skipGroup(1)],
+      ['Move cursor to previous group', 'K', () => this.flow.skipGroup(-1)],
+      ['Move argument to group - down', 'ctrl-alt-j',
+       () => this.flow.moveArgument(0, 1)],
+      ['Move argument to group - up', 'ctrl-alt-k',
+       () => this.flow.moveArgument(0, -1)],
+      ['Move argument to group - right', 'ctrl-alt-l',
+       () => this.flow.moveArgument(1, 0)],
+      ['Move argument to group - left', 'ctrl-alt-h',
+       () => this.flow.moveArgument(-1, 0)],
+      ['Move argument within group - down', 'ctrl-j',
+       () => this.flow.moveArgumentInSpeech(1)],
+      ['Move argument within group - up', 'ctrl-k',
+       () => this.flow.moveArgumentInSpeech(-1)],
       ['New argument', 'n', () => this.createArgument(false)],
-      ['New argument and create new group', 'N', () => this.createArgument(true)],
-      ['Delete argument', 'd', () => this.flow.deleteArgumentAtCursor()],
-      ['Edit argument', 'e', () => this.editArgument()],
-      ['Replace argument (overwrite)', 's', () => this.editArgument(true)]
+      ['New argument and create new group', 'N',
+       () => this.createArgument(true)],
+      ['Hide shortcuts panel', '?', () => this.input.togglePanel()]
     ]
 
     const editKeyMap: [string, string, () => void][] = [

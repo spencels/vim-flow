@@ -198,6 +198,17 @@ export class FlowService {
     this.moveCursor(iNewArgumentGroup, this.cursor.iSpeech, iNewArgument)
   }
 
+  // Moves cursor by group (-1 is up, 1 is down).
+  skipGroup(direction: number) {
+    if (this.trySetDefaultCursor()) return
+
+    const iNewArgumentGroup = this.cursor.iArgumentGroup + direction
+    if (iNewArgumentGroup >= 0
+        && iNewArgumentGroup < this.argumentGroups.length) {
+      this.moveCursor(iNewArgumentGroup, this.cursor.iSpeech, 0)
+    }
+  }
+
   // Move argument at cursor to new speech. 
   moveArgument(x: number, y: number) {
     const iNewArgumentGroup = this.cursor.iArgumentGroup + y

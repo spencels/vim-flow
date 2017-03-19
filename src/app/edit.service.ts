@@ -8,7 +8,6 @@ export class EditService {
   iArgument = -1
   text = ''
 
-
   startEditing(cursor: Cursor, text) {
     this.iArgumentGroup = cursor.iArgumentGroup
     this.iSpeech = cursor.iSpeech

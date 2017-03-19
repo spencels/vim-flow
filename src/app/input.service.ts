@@ -50,6 +50,9 @@ export class InputService {
     [Mode.edit, []]
   ])
 
+  // Is shortcuts panel visible?
+  public panelVisible = true
+
   // Maps keyboard shortcut.
   mapShortcut(mode: Mode, name: string, shortcut: string, action: () => void) {
     // Parse shortcut
@@ -101,6 +104,10 @@ export class InputService {
 
     event.preventDefault()
     keyMap[index].action()
+  }
+
+  togglePanel() {
+    this.panelVisible = !this.panelVisible
   }
 
   private getKeyMap(mode: Mode) {
