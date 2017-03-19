@@ -74,7 +74,11 @@ export class AppComponent {
       private input: InputService) {
     // Map keyboard shortcuts
     const commandKeyMap: [string, string, () => void][] = [
+      ['New argument', 'n', () => this.createArgument(false)],
+      ['New argument and create new group', 'N',
+       () => this.createArgument(true)],
       ['Delete argument', 'd', () => this.flow.deleteArgumentAtCursor()],
+      ['Delete row', 'D', () => this.flow.deleteArgumentGroupAtCursor()],
       ['Edit argument', 'e', () => this.editArgument()],
       ['Replace argument (overwrite)', 's', () => this.editArgument(true)],
       ['Move cursor down', 'j', () => this.flow.selectDown()],
@@ -83,23 +87,20 @@ export class AppComponent {
       ['Move cursor left', 'h', () => this.flow.selectLeft()],
       ['Move cursor to top', 'g', () => this.flow.selectTop()],
       ['Move cursor to bottom', 'G', () => this.flow.selectBottom()],
-      ['Move cursor to next group', 'J', () => this.flow.skipGroup(1)],
-      ['Move cursor to previous group', 'K', () => this.flow.skipGroup(-1)],
-      ['Move argument to group - down', 'ctrl-alt-j',
+      ['Move cursor to next row', 'J', () => this.flow.skipGroup(1)],
+      ['Move cursor to previous row', 'K', () => this.flow.skipGroup(-1)],
+      ['Move argument to row - down', 'ctrl-j',
        () => this.flow.moveArgument(0, 1)],
-      ['Move argument to group - up', 'ctrl-alt-k',
+      ['Move argument to row - up', 'ctrl-k',
        () => this.flow.moveArgument(0, -1)],
-      ['Move argument to group - right', 'ctrl-alt-l',
+      ['Move argument to row - right', 'ctrl-l',
        () => this.flow.moveArgument(1, 0)],
-      ['Move argument to group - left', 'ctrl-alt-h',
+      ['Move argument to row - left', 'ctrl-h',
        () => this.flow.moveArgument(-1, 0)],
-      ['Move argument within group - down', 'ctrl-j',
+      ['Move argument within row - down', 'ctrl-j',
        () => this.flow.moveArgumentInSpeech(1)],
-      ['Move argument within group - up', 'ctrl-k',
+      ['Move argument within row - up', 'ctrl-k',
        () => this.flow.moveArgumentInSpeech(-1)],
-      ['New argument', 'n', () => this.createArgument(false)],
-      ['New argument and create new group', 'N',
-       () => this.createArgument(true)],
       ['Hide shortcuts panel', '?', () => this.input.togglePanel()]
     ]
 

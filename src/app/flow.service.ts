@@ -58,6 +58,11 @@ export class FlowService {
     return speech[iArgument]
   }
 
+  getArgumentAtCursor() {
+    return this.getArgument(
+        this.cursor.iArgumentGroup, this.cursor.iSpeech, this.cursor.iArgument)
+  }
+
   // Gets speech at coordinates, or null if it doesn't exist.
   getSpeech(iArgumentGroup: number, iSpeech: number) {
     if (iArgumentGroup >= this.argumentGroups.length
@@ -252,7 +257,7 @@ export class FlowService {
   // Finds (argumentGroup, speech, argument) index tuple for the given argument.
   // Returns null if not found.
   deleteArgumentAtCursor() {
-    if (this.selectedArgument == null) return;  // TODO: throw error
+    if (this.cursor === Cursor.EMPTY || !this.getArgumentAtCursor()) return
 
     let { iArgumentGroup, iSpeech, iArgument } = this.cursor
 
@@ -288,6 +293,24 @@ export class FlowService {
     this.moveCursor(iArgumentGroup, iNewSpeech, iNewArgument)
   }
 
+  // Deletes an entire argument group.
+  deleteArgumentGroupAtCursor() {
+    if (this.cursor === Cursor.EMPTY) return
+
+    // Just delete the speeches if this is the only group.
+    if (this.argumentGroups.length == 1) {
+      this.argumentGroups[0] = []
+      this.moveCursor(0, 0, 0)
+      this.updateSpeechCount()
+      return
+    }
+
+    this.argumentGroups.splice(this.cursor.iArgumentGroup, 1)
+    const iNewArgumentGroup =
+        Math.min(this.cursor.iArgumentGroup, this.argumentGroups.length - 1)
+    this.moveCursor(iNewArgumentGroup, this.cursor.iSpeech, 0)
+  }
+
   // Replaces existing argument at cursor with the provided one.
   putArgument(argument: Argument) {
     this.getSpeechAtCursor()[this.cursor.iArgument] = argument
@@ -305,7 +328,8 @@ export class FlowService {
     let iInsertArgumentAt
     if (newGroup) {
       const iNewArgumentGroup = this.cursor.iArgumentGroup + 1
-      const newArgumentGroup = this.getOrCreateArgumentGroup(iNewArgumentGroup)
+      this.argumentGroups.splice(iNewArgumentGroup, 0, [])
+      const newArgumentGroup = this.argumentGroups[iNewArgumentGroup]
       speech = this.getOrCreateSpeech(iNewArgumentGroup, this.cursor.iSpeech)
       iInsertArgumentAt = 0
     } else {
