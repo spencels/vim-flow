@@ -20,6 +20,13 @@ export class FlowService {
 
   // Non-mutating methods
 
+  reset() {
+    this.argumentGroups = createCheckedArray([[]])
+    this.cursor = new Cursor(0, 0, 0)
+    this.selectedArgument = null
+    this.speechesCount = 0
+  }
+
   // Returns cursor for argument, or null if it is not in the flow.
   findArgument(argument: Argument) {
     for (var iGroup = 0; iGroup < this.argumentGroups.length; iGroup++) {

@@ -8,12 +8,15 @@ import { AppComponent } from 'app/app.component';
 import { FlowComponent } from 'app/flow.component';
 import { ArgumentComponent } from 'app/argument.component'
 import { InputsPanelComponent } from 'app/inputsPanel.component'
+import { ToolbarComponent } from 'app/toolbar.component'
 
 import { FocusDirective } from 'app/focus.directive'
 
 import { FlowService } from 'app/flow.service'
 import { EditService } from 'app/edit.service'
 import { InputService } from 'app/input.service';
+import { FileService } from 'app/file.service'
+import { DownloadService } from 'app/download.service'
 
 @NgModule({
   declarations: [
@@ -21,15 +24,25 @@ import { InputService } from 'app/input.service';
     FlowComponent,
     ArgumentComponent,
     FocusDirective,
-    InputsPanelComponent
+    InputsPanelComponent,
+    ToolbarComponent
   ],
+
   imports: [
     BrowserModule,
     FormsModule,
     HttpModule,
     MaterialModule
   ],
-  providers: [FlowService, EditService, InputService],
+
+  providers: [
+    FlowService,
+    EditService,
+    InputService,
+    FileService,
+    DownloadService
+  ],
+
   bootstrap: [AppComponent]
 })
 export class AppModule { }

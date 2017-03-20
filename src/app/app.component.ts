@@ -10,9 +10,11 @@ import { Argument } from 'app/flow.model'
   selector: 'app-root',
   template: `
     <div id="appContainer">
+      <app-toolbar></app-toolbar>
       <app-inputs-panel id="inputsPanel" [activeMode]="mode"
           [ngClass]="{'hidden': !input.panelVisible}">
       </app-inputs-panel>
+
       <div id="appFlowContainer">
         <app-flow 
           id="appFlow"
