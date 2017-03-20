@@ -58,6 +58,8 @@ import { FileService } from 'app/file.service'
       float: left;
       position: relative;
       margin: 0 0.5em;
+
+      z-index: 1;
     }
 
     #leftButtons {
