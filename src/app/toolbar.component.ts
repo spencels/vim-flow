@@ -31,6 +31,8 @@ import { FileService } from 'app/file.service'
       background-color: red;
       color: white;
       
+      position: relative;
+      width: 100%;
       overflow: hidden;
       box-shadow: 3px 3px 3px; #888888;
       z-index: 20;
@@ -42,9 +44,10 @@ import { FileService } from 'app/file.service'
 
       display: flex;
       align-items: center;
+      justify-content: center;
       height: 100%;
-      left: 50%;
-      position: relative;
+      width: 100%;
+      position: absolute;
     }
 
     .toolbarButton {
