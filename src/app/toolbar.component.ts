@@ -34,8 +34,8 @@ import { FileService } from 'app/file.service'
       position: relative;
       width: 100%;
       overflow: hidden;
-      box-shadow: 3px 3px 3px; #888888;
-      z-index: 20;
+      box-shadow: 0 0px 3px 3px rgba(0, 0, 0, 0.2);
+      z-index: 2;
     }
 
     #title {
@@ -58,8 +58,7 @@ import { FileService } from 'app/file.service'
       float: left;
       position: relative;
       margin: 0 0.5em;
-
-      z-index: 1;
+      z-index: 2;
     }
 
     #leftButtons {
