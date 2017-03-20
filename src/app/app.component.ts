@@ -23,7 +23,7 @@ import { Argument } from 'app/flow.model'
           (selectArgument)="flow.selectArgument($event)"
           (selectSpeech)="selectSpeech($event)"
           (editText)="editText($event)"
-          (window:keypress)="keyPress($event)">
+          (window:keydown)="keyPress($event)">
         </app-flow>
       </div>
     </div>
